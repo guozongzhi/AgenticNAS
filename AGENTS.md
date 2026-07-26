@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`demos/agentic_nas_demo/` contains the runnable reference package. Keep its implementation, `examples/`, `tests/`, and ignored `outputs/` together. The Conv1d Transformer lives in `model.py`, architecture mutations in `search_space.py`, objective/Pareto logic in `pareto.py`, and the Agent JSON contract in `agent.py`.
+`demos/agentic_nas_demo/` contains the runnable NAS reference package. `demos/llm_paper_analysis/` prepares page-labeled local PDF evidence for Codex; it must not require another LLM API. Keep each Demo's implementation, `examples/`, `tests/`, and ignored `outputs/` together.
 
 Keep architecture material in `docs/design/`, integration guides in `docs/guides/`, and paper notes in `research/papers/`. New research runs belong in `experiments/YYYYMMDD-short-topic/`, with experiment-specific `src/`, `tests/`, and ignored `outputs/` directories.
 
@@ -15,10 +15,11 @@ This is a clean-room reference for LLM-guided, multi-objective NAS of 4–10-lay
 ```bash
 PYTHONPATH=demos python3 -m unittest discover -s demos/agentic_nas_demo/tests -v
 PYTHONPATH=demos python3 -m agentic_nas_demo --iterations 3
-python3 -m compileall -q demos/agentic_nas_demo
+PYTHONPATH=demos/llm_paper_analysis python3 -m unittest discover -s demos/llm_paper_analysis/tests -v
+python3 -m compileall -q demos/agentic_nas_demo demos/llm_paper_analysis
 ```
 
-The first command runs the complete test suite. The second runs the provider-free Pareto-search demo and writes replayable Agent observations/actions. The last command catches import and syntax errors without creating a package build. PyTorch 2.0+ and Python 3.10+ are required.
+The first and third commands run each Demo's tests. The second runs the provider-free Pareto search. The last command catches import and syntax errors. Python 3.10+ and PyTorch 2.0+ are required; paper extraction additionally needs `pypdf`, PyMuPDF, or Poppler's `pdftotext`.
 
 ## Coding Style & Naming Conventions
 

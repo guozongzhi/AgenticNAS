@@ -53,16 +53,17 @@ demos/agentic_nas_demo/outputs/demo/
 ```text
 demos/
 ├── README.md
-└── agentic_nas_demo/
-    ├── model.py          # Conv1d Transformer
-    ├── search_space.py   # 架构配置和 block/cell/op 变异
-    ├── pareto.py         # 演示指标、支配关系和 Pareto 前沿
-    ├── agent.py          # Agent observation/action 契约
-    ├── search.py         # Agent proposal → 校验 → 评估 → Pareto 闭环
-    ├── __main__.py       # 命令行入口
-    ├── examples/         # Demo 专属输入输出示例
-    ├── tests/            # Demo 单元测试
-    └── outputs/          # 已忽略的本地运行产物
+├── agentic_nas_demo/
+│   ├── model.py          # Conv1d Transformer
+│   ├── search_space.py   # 架构配置和 block/cell/op 变异
+│   ├── pareto.py         # 演示指标、支配关系和 Pareto 前沿
+│   ├── agent.py          # Agent observation/action 契约
+│   ├── search.py         # Agent proposal → 校验 → 评估 → Pareto 闭环
+│   ├── __main__.py       # 命令行入口
+│   ├── examples/         # Demo 专属输入输出示例
+│   ├── tests/            # Demo 单元测试
+│   └── outputs/          # 已忽略的本地运行产物
+└── llm_paper_analysis/   # 本地 PDF 检索与 Codex 结构化解析
 
 experiments/
 └── README.md             # 正式实验的 src/tests/outputs 约定
@@ -107,6 +108,7 @@ research/
 
 - [LLM 训练参数调优方案](docs/guides/LLM_TRAINING_TUNING.md)：将 LLM 作为受约束的训练参数提议器，并与 NAS 结构收益公平分离。
 - [研究资料入口](research/README.md)：维护 NAS 论文的阅读队列、单篇笔记和可复现行动项。
+- [Codex 论文解析工具](demos/llm_paper_analysis/README.md)：从本地 PDF 检索带页码证据，并由 Codex 生成待人工核验的结构化笔记。
 - [实验目录约定](experiments/README.md)：将后续实验的协议、专属代码和可公开结果按实验归档。
 
 ## 与 Archai 的关系
