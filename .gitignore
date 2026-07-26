@@ -1,7 +1,15 @@
 __pycache__/
 *.py[cod]
+.DS_Store
 .venv/
-outputs/
+
+# Generated run artifacts stay beside their demo or experiment code.
+**/outputs/
+
 *.egg-info/
 build/
 dist/
+
+# Local research-paper cache; keep metadata and notes in Git, not PDF binaries.
+research/papers/pdfs/*.pdf
+research/papers/pdfs/*.part

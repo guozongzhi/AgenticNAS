@@ -27,19 +27,18 @@ Demo 不包含公司内部 Archai 实现、真实数据集或训练代码，可�
 环境要求：Python 3.10+、PyTorch 2.0+。
 
 ```bash
-python3 -m unittest discover -s tests -v
-python3 -m agentic_nas_demo \
+PYTHONPATH=demos python3 -m unittest discover -s demos/agentic_nas_demo/tests -v
+PYTHONPATH=demos python3 -m agentic_nas_demo \
   --seed 7 \
   --initial-population 6 \
   --iterations 3 \
-  --proposals 4 \
-  --trace-dir outputs/demo
+  --proposals 4
 ```
 
 运行后会生成：
 
 ```text
-outputs/demo/
+demos/agentic_nas_demo/outputs/demo/
 ├── iteration_01_observation.json
 ├── iteration_01_actions.json
 ├── iteration_02_observation.json
@@ -52,18 +51,34 @@ outputs/demo/
 ## 代码结构
 
 ```text
-agentic_nas_demo/
-├── model.py          # Conv1d Transformer
-├── search_space.py   # 架构配置和 block/cell/op 变异
-├── pareto.py         # 演示指标、支配关系和 Pareto 前沿
-├── agent.py          # Agent observation/action 契约
-├── search.py         # Agent proposal → 校验 → 评估 → Pareto 闭环
-└── __main__.py       # 命令行入口
+demos/
+├── README.md
+└── agentic_nas_demo/
+    ├── model.py          # Conv1d Transformer
+    ├── search_space.py   # 架构配置和 block/cell/op 变异
+    ├── pareto.py         # 演示指标、支配关系和 Pareto 前沿
+    ├── agent.py          # Agent observation/action 契约
+    ├── search.py         # Agent proposal → 校验 → 评估 → Pareto 闭环
+    ├── __main__.py       # 命令行入口
+    ├── examples/         # Demo 专属输入输出示例
+    ├── tests/            # Demo 单元测试
+    └── outputs/          # 已忽略的本地运行产物
+
+experiments/
+└── README.md             # 正式实验的 src/tests/outputs 约定
 
 docs/
-├── DESIGN.md
-├── INTERNAL_AGENT_GUIDE.md
-└── CLAUDE_CODE_TASK.md
+├── README.md
+├── design/
+│   └── DESIGN.md
+└── guides/
+    ├── INTERNAL_AGENT_GUIDE.md
+    ├── CLAUDE_CODE_TASK.md
+    └── LLM_TRAINING_TUNING.md
+
+research/
+├── README.md
+└── papers/                  # NAS paper index and retained reading notes
 ```
 
 ## 搜索层次
@@ -86,7 +101,13 @@ docs/
 - 编译成功率；
 - 完整训练精度或 perplexity。
 
-详细模型、搜索和迁移设计见 [DESIGN.md](docs/DESIGN.md)，内部 Agent 接入见 [INTERNAL_AGENT_GUIDE.md](docs/INTERNAL_AGENT_GUIDE.md)。
+详细模型与搜索设计见 [DESIGN.md](docs/design/DESIGN.md)，内部 Agent 接入见 [INTERNAL_AGENT_GUIDE.md](docs/guides/INTERNAL_AGENT_GUIDE.md)。
+
+## 研究工作流
+
+- [LLM 训练参数调优方案](docs/guides/LLM_TRAINING_TUNING.md)：将 LLM 作为受约束的训练参数提议器，并与 NAS 结构收益公平分离。
+- [研究资料入口](research/README.md)：维护 NAS 论文的阅读队列、单篇笔记和可复现行动项。
+- [实验目录约定](experiments/README.md)：将后续实验的协议、专属代码和可公开结果按实验归档。
 
 ## 与 Archai 的关系
 

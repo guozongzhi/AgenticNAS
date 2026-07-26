@@ -9,5 +9,9 @@ description = "Clean-room Agentic NAS demo for Conv1d-based Transformers"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.0"]
 
+[tool.setuptools]
+package-dir = {"" = "demos"}
+
 [tool.setuptools.packages.find]
+where = ["demos"]
 include = ["agentic_nas_demo*"]

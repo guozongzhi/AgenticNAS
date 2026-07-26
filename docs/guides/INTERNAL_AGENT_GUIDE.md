@@ -88,7 +88,7 @@ result = run_search(
     initial_population=8,
     iterations=5,
     proposals_per_iteration=6,
-    trace_dir="outputs/internal_agent",
+    trace_dir="demos/agentic_nas_demo/outputs/internal_agent",
 )
 ```
 

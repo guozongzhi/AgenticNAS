@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 
 from .search import run_search
 
@@ -12,7 +13,11 @@ def main() -> None:
     parser.add_argument("--initial-population", type=int, default=6)
     parser.add_argument("--iterations", type=int, default=3)
     parser.add_argument("--proposals", type=int, default=4)
-    parser.add_argument("--trace-dir", default="outputs/demo")
+    parser.add_argument(
+        "--trace-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "outputs" / "demo",
+    )
     args = parser.parse_args()
 
     result = run_search(
