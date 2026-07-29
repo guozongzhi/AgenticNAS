@@ -2,6 +2,9 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Agentic Neural Architecture Search](https://arxiv.org/abs/2607.07984) | 2026/arXiv | `llm-nas`, `slotted-architecture`, `evolution` | [解析](parsed/2026-arxiv-agentnas.md) | 复现 v1.0 tag，并核对 matched-budget 与 LLM 成本 |
+| codex_draft | [Structuring Open-Ended NAS: Semi-Automated Design Knowledge Structuring with LLMs for Efficient Neural Architecture Search](https://arxiv.org/abs/2605.19247) | 2026/arXiv | `llm-nas`, `pareto`, `open-ended` | [解析](parsed/2026-arxiv-fairnad.md) | 核对知识库授权、LLM token 成本与公开代码 |
+| codex_draft | [LLM-NAS: LLM-driven Hardware-Aware Neural Architecture Search](https://arxiv.org/abs/2510.01472) | 2026/GECCO | `llm-nas`, `pareto`, `hardware-aware` | [解析](parsed/2026-gecco-llm-nas.md) | 复算 HV/IGD，并核验预测器训练与真实设备外推 |
 | codex_draft | [EvoPrompting: Language Models for Code-Level Neural Architecture Search](https://arxiv.org/abs/2302.14838) | 2023/arXiv | `llm-nas`, `evolution` | [解析](parsed/2023-neurips-evoprompting.md) · [PDF](pdfs/2302.14838-evoprompting.pdf) | 核对搜索预算与消融表格 |
 | codex_draft | [LLMatic: Neural Architecture Search via Large Language Models and Quality Diversity Optimization](https://arxiv.org/abs/2306.01102) | 2024/GECCO | `llm-nas`, `evolution` | [解析](parsed/2024-gecco-llmatic.md) · [PDF](pdfs/2306.01102-llmatic.pdf) | 对比 QD archives 与 Pareto 前沿 |
 | codex_draft | [NADER: Neural Architecture Design via Multi-Agent Collaboration](https://arxiv.org/abs/2412.19206) | 2024/arXiv | `llm-nas` | [解析](parsed/2024-arxiv-nader.md) · [PDF](pdfs/2412.19206-nader.pdf) | 将图动作映射到 block/cell/op |
