@@ -55,9 +55,10 @@ AutoLLMResearch 把 LLM 实验配置建模为长 horizon MDP，让 Agent 从低/
 - 离线 gym 可能存在表格覆盖和 nearest-valid matching，真实连续空间中的失败更复杂。
 - 2026 预印本需要优先核查公开代码、数据许可和复现实验。
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立课题的关系
 
-- 与半年计划最贴近：联合覆盖 Transformer architecture 与 training HPO，并显式建模 fidelity。
+- 归类为跨 `LLM × NAS` / `LLM × HPO` 任务的多保真邻接工作：论文用同一类 Agent 分别处理模型架构、预训练 HPO、GRPO HPO 和数据 mixture 四类任务，并未在单个搜索空间中联合优化架构与训练配方。（PDF pp.4–5, Table 2）
+- 当前 NAS/HPO 两条线不共享 Agent 训练或结果归因；若复现，架构任务和训练配方任务必须分别记录。
 - 可先实现轻量版本：short-train/medium/full 三层 evaluator，不必立即训练专用 RL Agent。
 - nearest-valid matching 不应静默替换非法动作；当前 validator 应记录 reject 与显式修复。
 
@@ -71,15 +72,15 @@ AutoLLMResearch 把 LLM 实验配置建模为长 horizon MDP，让 Agent 从低/
 
 - 环境构建成本极高，难在公司项目早期直接复刻。
 - 离线表格和真实训练环境之间可能存在 distribution shift。
-- 同时搜索架构和超参会增加归因难度，第一阶段应隔离变量。
+- 用统一 Agent 跨架构与训练配置任务学习会增加归因难度；当前只把该论文作为多保真与跨任务迁移的方法证据。
 
 ## 可引用摘要
 
-AutoLLMResearch 通过 LLMConfig-Gym 和多阶段 Agent 训练，将便宜实验到昂贵实验的配置外推建模为长 horizon MDP。其四类任务同时覆盖架构与训练参数，并在高保真查询受限时报告优势；但结果依赖大型离线 outcome corpus 和成本摊销假设，更适合作为多保真研究路线而非近期直接复刻目标。
+AutoLLMResearch 通过 LLMConfig-Gym 和多阶段 Agent 训练，将便宜实验到昂贵实验的配置外推建模为长 horizon MDP。其四类独立任务分别覆盖架构、预训练 HPO、GRPO HPO 和数据 mixture，并在高保真查询受限时报告优势；但结果依赖大型离线 outcome corpus 和成本摊销假设，更适合作为跨任务多保真研究路线，而不是 NAS/HPO 联合搜索的证据。
 
 ## 检索与人工核验记录
 
-- 解析问题：多保真环境、架构/HPO 联合任务、预算和成本摊销。
+- 解析问题：多保真环境、架构/HPO 分立任务、预算和成本摊销。
 - 使用片段页码：1, 3–6, 9, 12, 23, 32, 33。
 - [x] 四任务、>1M GPU-hours 和 1–5 budget 已核对
 - [x] Agent 训练硬件和 backbone 已定位

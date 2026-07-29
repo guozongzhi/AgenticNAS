@@ -1,8 +1,8 @@
 # 本地论文 PDF 缓存
 
-本目录保存从 arXiv 下载的阅读副本。`*.pdf` 和未完成的 `*.part` 文件已被 Git 忽略；远端仓库仅保留本清单、论文索引和原创笔记。
+本目录保存从 arXiv、期刊官网等官方来源下载的阅读副本。`*.pdf` 和未完成的 `*.part` 文件已被 Git 忽略；远端仓库仅保留本清单、论文索引和原创笔记。
 
-| Local file | arXiv | Pages | SHA-256 |
+| Local file | Source | Pages | SHA-256 |
 |---|---:|---:|---|
 | [1909.01051-manas.pdf](1909.01051-manas.pdf) | [1909.01051](https://arxiv.org/abs/1909.01051) | 24 | `55fb04f8af406f045b663c3d899da00bcb4e224ebc937e78fc4a087c0d044068` |
 | [2302.14838-evoprompting.pdf](2302.14838-evoprompting.pdf) | [2302.14838](https://arxiv.org/abs/2302.14838) | 31 | `8febb503edfda11041e01ad7c7e5b1454dda5740ac9d37251a449601d3afe2da` |
@@ -12,10 +12,14 @@
 | [2312.04528-llm-hpo.pdf](2312.04528-llm-hpo.pdf) | [2312.04528](https://arxiv.org/abs/2312.04528) | 28 | `d6193c6909e01773145d9e9a062a5a6dea7fd106fb902696df4852fd8eb4af49` |
 | [2402.01881-agenthpo.pdf](2402.01881-agenthpo.pdf) | [2402.01881](https://arxiv.org/abs/2402.01881) | 24 | `c2d8097dd384e96728ab32368358d950295f236e2b3eed54adce01317cf5f971` |
 | [2402.03921-llambo.pdf](2402.03921-llambo.pdf) | [2402.03921](https://arxiv.org/abs/2402.03921) | 33 | `7b6040f88088039c40e632c4ac0649da61c9d255eb7091fa898790ecae3e4cae` |
+| [2402.15351-autommlab.pdf](2402.15351-autommlab.pdf) | [2402.15351v2](https://arxiv.org/abs/2402.15351) | 19 | `ae52dfcaeb627209c7ded24485ec874b16786ca027c5af927214bd9f5977d7a0` |
+| [2410.20302-sllmbo.pdf](2410.20302-sllmbo.pdf) | [2410.20302v3](https://arxiv.org/abs/2410.20302) | 40 | `c92ef2ffe4c9b61c4792bcc86521d98da142e7e45be4dfe573007749fa2818a6` |
 | [2412.19206-nader.pdf](2412.19206-nader.pdf) | [2412.19206](https://arxiv.org/abs/2412.19206) | 18 | `465282d63160e25eeb47f1a8253b3b8f5d61d1929dcd5d5acdc34e39a9297d12` |
 | [2603.15939-data-local-llm-nas.pdf](2603.15939-data-local-llm-nas.pdf) | [2603.15939](https://arxiv.org/abs/2603.15939) | 16 | `2d5ee55c5bb65a3e2ffb7994f5bbebb99579ca934e03592e32aa06c6ca648f61` |
+| [2603.24647-llm-vs-classical-hpo.pdf](2603.24647-llm-vs-classical-hpo.pdf) | [2603.24647v5](https://arxiv.org/abs/2603.24647) | 20 | `3fe993212b673d298a5038fdd633c8697bb82471839c33e5ae6b5809d6ecc8c2` |
 | [2605.11518-autollmresearch.pdf](2605.11518-autollmresearch.pdf) | [2605.11518](https://arxiv.org/abs/2605.11518) | 41 | `e5ccece82a6d45934b575d3008cc39cdd5b26ae40c6fdc0ce8eba11b73dccc17` |
 | [2606.10294-uh-nas.pdf](2606.10294-uh-nas.pdf) | [2606.10294](https://arxiv.org/abs/2606.10294) | 16 | `a668a991e9528afad1f05d9ebdb7ca80536a1c3886a2b13b5ffeb640e3d731cf` |
+| [2026-nature-rocket-hpo.pdf](2026-nature-rocket-hpo.pdf) | [Nature Communications / DOI](https://doi.org/10.1038/s41467-026-72413-9) | 49 | `9f81f333a3e3fdd14f2cd8c040f7465a15de99faa3ec19ad18b0eb541311e883` |
 
 重新校验单个文件：
 

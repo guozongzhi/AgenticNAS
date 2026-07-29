@@ -38,6 +38,7 @@ AgentHPO 用 Creator 负责根据任务和历史日志提出超参，Executor �
 |---|---|---|---|---|
 | GPT-4 10 trials 优于 random | 平均改善 6.66% | random search | p.8, Sec. 5.1 | high |
 | GPT-4 可超过 human best | 平均改善 1.52% | 100-trial human-best proxy | p.8 | medium |
+| T5-Small 翻译任务可进入 Agent 闭环 | 10th trial BLEU：GPT-4 28.02±0.61，random 25.72±0.92，Bayesian 26.70±0.59，100-trial peak proxy 27.47 | random、Bayesian、peak proxy | p.17, Table 3 | high |
 | 完整训练日志有帮助 | 优于只记录 HP-score 的 OPRO | OPRO | pp.8–9, Fig. 4 | medium |
 | post-cutoff 数据仍有效 | Butterfly 85.92±0.57%，human 78.27% | human result | p.8 | high |
 
@@ -45,13 +46,16 @@ AgentHPO 用 Creator 负责根据任务和历史日志提出超参，Executor �
 
 - “human best”实际由 100-trial baseline peak 近似，并非真实专家统一预算。
 - LLM 只有 10 trials，而 baseline 同时报告 100 trials peak；不同图表的比较口径需仔细区分。
+- GPT-4 运行 5 runs、GPT-3.5 运行 10 runs；两种 LLM 的方差估计预算不同。（PDF p.7）
 - 使用 GPT-3.5/GPT-4 专有模型，提示词和模型版本对结果影响较大。
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立 HPO 课题的关系
 
+- 归类为 `LLM × HPO`；T5-Small 翻译只搜索 learning rate、dropout、epochs、batch size 和 weight decay，架构固定。（PDF pp.15–16）
 - Creator/Executor 可映射为 proposal policy 与现有 evaluator，但 Executor 不应自由修改公司源码。
 - 完整 learning curve 可先在内部压缩为 overfit/underfit/diverged 等枚举信号。
 - 其 memory 结构适合训练参数 Agent，不应与架构历史混在同一 archive。
+- 这些结果不得用于支持 LLM-guided NAS。
 
 ## 最小复现实验
 
@@ -74,6 +78,6 @@ AgentHPO 将 HPO 拆分为提出配置的 Creator 和执行、分析、记录实
 - 解析问题：Creator/Executor、日志 memory、trial 预算和基线公平性。
 - 使用片段页码：1–6, 8–10, 14。
 - [x] 10-trial 与 baseline 100-trial 口径已核对
-- [x] GPT-4 平均改善数字已核对
+- [x] GPT-4 平均改善与 T5-Small Table 3 数字已核对
 - [ ] 12 个任务逐项结果已核对
 - [ ] 已由人工决定 `retained` / `discarded`

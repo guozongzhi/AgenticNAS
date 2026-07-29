@@ -46,8 +46,9 @@ tags: [hpo, instruction-tuning, lora, black-box]
 - 只用单次/少量训练评估，seed variance 和训练噪声报告有限。
 - 4×A100、100 次 trial 的成本仍高，不适合作为小型模型 Agent 的默认内环。
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立 HPO 课题的关系
 
+- 归类为固定 LLaMA 2 7B 架构的传统 `HPO` 基线，不是 LLM 作为优化器的工作。
 - 是训练参数优化的传统非 Agent 基线，应优先于 LLM Agent 比较。
 - 提醒项目不要只用 validation loss：还需 downstream、稳定性、吞吐和显存目标。
 - 可将 NOMAD/TPE 作为固定预算下的强对照，再测 Codex 是否改善 warm-start。

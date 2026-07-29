@@ -31,10 +31,13 @@ What precise claim does the paper make? State it without promotional wording.
 - Is the budget fair across methods?
 - What ablation isolates the claimed contribution?
 
-## Findings relevant to AgenticNAS
+## Findings relevant to the independent research tracks
 
+- Classification: `LLM × NAS` / `LLM × HPO` / `mixed-search-space` / adjacent baseline
+- Variables changed and variables held fixed:
 - Reusable idea:
 - Conflict with this repository's design:
+- Claim that must not be transferred to the other track:
 - Failure mode or threat to validity:
 - What must be anonymized or controlled in our experiments?
 

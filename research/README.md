@@ -4,6 +4,7 @@
 
 ```text
 research/
+├── topics/          # 独立技术点研究档案（长期维护）
 ├── papers/
 │   ├── INDEX.md       # 阅读队列、状态和主题索引
 │   ├── TEMPLATE.md    # 单篇论文笔记模板
@@ -13,6 +14,18 @@ research/
 │   └── pdfs/
 │       └── README.md  # 本地 PDF 文件名、页数和校验值
 ```
+
+## 技术点档案
+
+`topics/` 存放跨论文的主题级研究档案，与单篇论文笔记互补：
+
+- [研究课题边界](topics/README.md) — 将 `LLM × NAS` 与 `LLM × HPO` 作为两个独立课题，定义各自的搜索变量、固定项、基线、指标和停止线；
+- [边缘视觉小模型（工业单任务场景）](topics/edge-vision-small-models.md) — 架构选型、蒸馏/量化/剪枝、边缘部署，及其与 hardware-aware NAS 的接口；
+- [LLM 辅助的超参数优化](topics/llm-hpo-training-automation.md) — 小型 ViT、CNN、Encoder-Decoder 上的 LLM4HPO 实践、经典 HPO 对照和独立实验协议。
+
+当前不做 NAS/HPO 联合搜索。NAS 实验固定训练配方，HPO 实验固定模型架构；两条线分别建立可复现基线后，再决定是否新建融合课题。
+
+档案中的结论若来自行业博客或未核验来源，必须标注；单篇论文证据仍走 `papers/` 流程。
 
 ## 使用流程
 
@@ -27,4 +40,4 @@ research/
 
 Git 中只保存引用信息、公开链接、自己的笔记、PDF 清单和获批可公开的结果。`papers/pdfs/*.pdf` 是已忽略的本地缓存；受版权保护的 PDF、公司内部日志、密钥和未审批架构细节不得提交到远端仓库。
 
-建议标签保持小而稳定：`llm-nas`、`evolution`、`pareto`、`hardware-aware`、`zero-cost`、`transformer`、`benchmark`、`hpo`。
+建议标签保持小而稳定：`llm-nas`、`evolution`、`pareto`、`hardware-aware`、`zero-cost`、`transformer`、`benchmark`、`hpo`、`edge-vision`、`mixed-search-space`、`multi-fidelity`、`mle-agent`。

@@ -11,4 +11,13 @@
 - 完成人工核验后填写模板末尾的检查项，并在 `INDEX.md` 中链接笔记；
 - 未经人工核验的内容不能直接用于论文 related work 或实验结论。
 
+## NAS/HPO 归类
+
+- `LLM × NAS`：搜索深度、宽度、block/cell/op、算子或连接等结构变量，训练配方必须固定；
+- `LLM × HPO`：固定模型架构，只搜索学习率、batch size、weight decay、dropout、optimizer、schedule 等训练配方；
+- 同时含结构与训练字段时标为 `mixed-search-space`，只作相邻方法证据，不得直接支撑任一独立课题的效果结论；
+- 端到端 MLE Agent、模型选择和部署流程单列为邻接基准，不混入固定架构 HPO 排名。
+
+每篇笔记必须写明可变项、固定项和不可跨课题转移的结论。
+
 Codex 证据包工具与使用方法见 [`demos/llm_paper_analysis/`](../../../demos/llm_paper_analysis/README.md)。

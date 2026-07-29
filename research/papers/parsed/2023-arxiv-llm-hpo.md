@@ -46,11 +46,13 @@ tags: [hpo, llm-optimizer, bayesian-optimization]
 - GPT 模型可能见过公开 HPO benchmark；post-cutoff Taxi 仅覆盖 code-generation 子实验。
 - 生成代码的合法性、安全性和搜索空间大小与结构化 HPO 不完全可比。
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立 HPO 课题的关系
 
+- 归类为 `LLM × HPO`：ViT/ResNet 架构固定，只搜索训练超参。
 - 最适合做“Codex 前 5–10 个 warm-start + 传统 BO/TPE 后续”的基线。
 - 架构代码不应直接生成；沿用声明式 `TrainingConfigAction` 和 validator。
 - observation 应只提供聚合曲线特征和历史配置，避免完整内部日志。
+- 该论文的 HPO 收益不得作为 LLM-guided NAS 的证据。
 
 ## 最小复现实验
 
@@ -66,7 +68,7 @@ tags: [hpo, llm-optimizer, bayesian-optimization]
 
 ## 可引用摘要
 
-Zhang 等将语言模型作为序贯 HPO 提议器，根据任务描述和历史验证损失持续生成配置。GPT-4 Turbo 在 10-evaluation 基准上优于 random，并可改善 BO warm-start；但公开 benchmark 污染和专有模型版本限制了结论，代码生成扩展也不适合直接用于受约束内部 NAS。
+Zhang 等将语言模型作为序贯 HPO 提议器，根据任务描述和历史验证损失持续生成配置。GPT-4 Turbo 在 10-evaluation 基准上优于 random，并可改善 BO warm-start；但公开 benchmark 污染和专有模型版本限制了结论，代码生成扩展也不适合本仓库的结构化训练 HPO。
 
 ## 检索与人工核验记录
 

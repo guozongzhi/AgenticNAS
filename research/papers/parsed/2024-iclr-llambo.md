@@ -48,11 +48,12 @@ LLAMBO 不替代 Bayesian Optimization，而是用 GPT-3.5 分别增强 zero-sho
 - proprietary/synthetic datasets 用于减轻记忆污染，但具体泄漏风险仍需看数据构造。
 - LLM 调用成本未与传统 surrogate 的计算成本统一折算。
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立 HPO 课题的关系
 
+- 归类为 `LLM × HPO`；论文在固定低维搜索空间中增强 BO 组件，不搜索神经网络结构。
 - 这是训练参数 Agent 最重要的混合基线：Codex 提供 warm-start/候选，BO 保留统计选择。
 - 不应让 LLM 取代 uncertainty-aware acquisition；其校准弱于 GP。
-- 对架构搜索可只借鉴 warm-start，不把连续 BO 假设硬套到离散 block/cell/op。
+- 不把连续 BO 结果硬套到离散 block/cell/op，也不把 LLAMBO 结果计入 NAS 对比。
 
 ## 最小复现实验
 

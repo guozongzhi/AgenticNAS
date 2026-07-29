@@ -65,11 +65,12 @@ tags: []
 - 是否可能存在 benchmark 或代码泄漏：
 - 论文未报告的重要信息：
 
-## 与 AgenticNAS 的关系
+## 与本仓库独立课题的关系
 
+- 归类：`LLM × NAS` / `LLM × HPO` / `mixed-search-space` / 邻接基准
+- 论文中的可变项与固定项：
 - 可复用设计：
-- 与 block/cell/op + Pareto 方案的对应：
-- 与训练超参 Agent 的对应：
+- 不可跨课题转移的结论：
 - 与公司内部 clean-room 边界的冲突：
 - 最值得验证的研究假设：
 
