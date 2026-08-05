@@ -8,6 +8,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [GraphIR: Architecture-Level Search States for LLM-Guided Neural Architecture Evolution](https://arxiv.org/abs/2608.01633) | 2026/arXiv | `llm-nas`, `architecture-ir`, `action-validity`, `code-evolution` | [解析](parsed/2026-arxiv-graphir.md) | 获取作者代码，复现 100-iteration matched-budget representation 消融 |
 | codex_draft | [Agentic Neural Architecture Search](https://arxiv.org/abs/2607.07984) | 2026/arXiv | `llm-nas`, `slotted-architecture`, `evolution` | [解析](parsed/2026-arxiv-agentnas.md) | 复现 v1.0 tag，并核对 matched-budget 与 LLM 成本 |
 | codex_draft | [Structuring Open-Ended NAS: Semi-Automated Design Knowledge Structuring with LLMs for Efficient Neural Architecture Search](https://arxiv.org/abs/2605.19247) | 2026/arXiv | `llm-nas`, `pareto`, `open-ended` | [解析](parsed/2026-arxiv-fairnad.md) | 核对知识库授权、LLM token 成本与公开代码 |
 | codex_draft | [LLM-NAS: LLM-driven Hardware-Aware Neural Architecture Search](https://arxiv.org/abs/2510.01472) | 2026/GECCO | `llm-nas`, `pareto`, `hardware-aware` | [解析](parsed/2026-gecco-llm-nas.md) | 复算 HV/IGD，并核验预测器训练与真实设备外推 |
@@ -47,6 +48,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Long-Horizon Autonomous Architecture Research with a Language-Model Agent: A Behavioural Case Study](https://arxiv.org/abs/2608.01995) | 2026/arXiv | `llm-nas`, `long-horizon`, `memory`, `mixed-search-space` | [解析](parsed/2026-arxiv-long-horizon-architecture-research.md) | 等待公开模型版本与训练代码，并做多 seed/多 workflow 对照 |
 | codex_draft | [Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch](https://arxiv.org/abs/2603.24647) | 2026/arXiv | `hpo`, `benchmark`, `hybrid`, `mixed-search-space` | [解析](parsed/2026-arxiv-llm-vs-classical-hpo.md) · [PDF](pdfs/2603.24647-llm-vs-classical-hpo.pdf) | 固定结构字段后再复现 TPE/CMA-ES/Centaur |
 
 ## 相邻方法：跨 NAS/HPO 任务的多保真 Agent
