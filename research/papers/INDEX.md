@@ -8,6 +8,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [ATHENA: Knowledge-guided agentic neural architecture search for AutoFormer-based electronic health record modeling](https://arxiv.org/abs/2608.21712) | 2026/arXiv | `llm-nas`, `transformer`, `knowledge-transfer`, `weight-sharing`, `multi-agent` | [解析](parsed/2026-arxiv-athena.md) | 锁定代码 commit，补齐 prior 构建与 LLM calls/tokens 成本，并做无 prior 的 matched-budget 复现 |
+| codex_draft | [Consensus-gated Multi-Agent Neural Architecture Search for Seismic Fault Segmentation](https://arxiv.org/abs/2608.13889) | 2026/arXiv | `llm-nas`, `multi-agent`, `code-generation`, `test-feedback`, `parameter-budget` | [解析](parsed/2026-arxiv-consensus-gated-seismic-nas.md) | 改用独立 validation 反馈，增加单 LLM/随机/经典 NAS 与多 search-seed 对照 |
 | codex_draft | [GraphIR: Architecture-Level Search States for LLM-Guided Neural Architecture Evolution](https://arxiv.org/abs/2608.01633) | 2026/arXiv | `llm-nas`, `architecture-ir`, `action-validity`, `code-evolution` | [解析](parsed/2026-arxiv-graphir.md) | 获取作者代码，复现 100-iteration matched-budget representation 消融 |
 | codex_draft | [Agentic Neural Architecture Search](https://arxiv.org/abs/2607.07984) | 2026/arXiv | `llm-nas`, `slotted-architecture`, `evolution` | [解析](parsed/2026-arxiv-agentnas.md) | 复现 v1.0 tag，并核对 matched-budget 与 LLM 成本 |
 | codex_draft | [Structuring Open-Ended NAS: Semi-Automated Design Knowledge Structuring with LLMs for Efficient Neural Architecture Search](https://arxiv.org/abs/2605.19247) | 2026/arXiv | `llm-nas`, `pareto`, `open-ended` | [解析](parsed/2026-arxiv-fairnad.md) | 核对知识库授权、LLM token 成本与公开代码 |
