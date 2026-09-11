@@ -8,6 +8,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Enhancing LLM-Based Neural Network Generation: Few-Shot Prompting and Efficient Validation for Automated Architecture Design](https://arxiv.org/abs/2512.24120) | 2025/arXiv v2 | `llm-nas`, `code-generation`, `few-shot`, `one-epoch-proxy` | [解析](parsed/2025-arxiv-few-shot-prompting-nas.md) | 冻结 paper commit，以相同 attempted/valid/trained 预算和多 search seeds 复核 n=1/3/6，并补 multi-epoch 排序与完整 GPU/LLM 成本 |
 | codex_draft | [CoLLM-NAS: Collaborative Large Language Models for Efficient Knowledge-Guided Neural Architecture Search](https://arxiv.org/abs/2509.26037) | 2026/CVPR Workshops (CVPR-NAS Oral) | `llm-nas`, `multi-agent`, `weight-sharing`, `cell-search`, `transformer` | [解析](parsed/2026-cvprw-collm-nas.md) | 获取作者代码与完整 traces，统一 LLM/GPU/超网成本，并做 250-candidate matched-budget 多 seed 复现 |
 | codex_draft | [AutoMCU: Feasibility-First MCU Neural Network Customization via LLM-based Multi-Agent Systems](https://arxiv.org/abs/2605.21560) | 2026/arXiv | `llm-nas`, `multi-agent`, `hardware-aware`, `mcu`, `deployment` | [解析](parsed/2026-arxiv-automcu.md) | 获取代码与 STM32Cube.AI/训练配置，补 latency/energy，并用 matched-budget HW-NAS 复现 |
 | codex_draft | [ATHENA: Knowledge-guided agentic neural architecture search for AutoFormer-based electronic health record modeling](https://arxiv.org/abs/2608.21712) | 2026/arXiv | `llm-nas`, `transformer`, `knowledge-transfer`, `weight-sharing`, `multi-agent` | [解析](parsed/2026-arxiv-athena.md) | 锁定代码 commit，补齐 prior 构建与 LLM calls/tokens 成本，并做无 prior 的 matched-budget 复现 |
@@ -52,6 +53,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [LLM-Driven AutoML for Cross-Lingual Handwritten OCR: Closed-Loop Neural Architecture Search with GPT-5, GPT-4o, and Claude Sonnet 4](https://arxiv.org/abs/2607.15509) | 2025/ICCKE | `llm-nas`, `mixed-search-space`, `closed-loop`, `test-feedback` | [解析](parsed/2025-iccke-llm-ocr-automl.md) | 禁止 test feedback，拆分 architecture-only/HPO-only，并以 matched-budget 多 seed、真实设备指标和完整成本复现 |
 | codex_draft | [Long-Horizon Autonomous Architecture Research with a Language-Model Agent: A Behavioural Case Study](https://arxiv.org/abs/2608.01995) | 2026/arXiv | `llm-nas`, `long-horizon`, `memory`, `mixed-search-space` | [解析](parsed/2026-arxiv-long-horizon-architecture-research.md) | 等待公开模型版本与训练代码，并做多 seed/多 workflow 对照 |
 | codex_draft | [Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch](https://arxiv.org/abs/2603.24647) | 2026/arXiv | `hpo`, `benchmark`, `hybrid`, `mixed-search-space` | [解析](parsed/2026-arxiv-llm-vs-classical-hpo.md) · [PDF](pdfs/2603.24647-llm-vs-classical-hpo.pdf) | 固定结构字段后再复现 TPE/CMA-ES/Centaur |
 
