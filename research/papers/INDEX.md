@@ -8,6 +8,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Cognitive-YOLO: LLM-Driven Architecture Synthesis from First Principles of Data for Object Detection](https://arxiv.org/abs/2512.12281) | 2026/arXiv v2 | `llm-nas`, `architecture-synthesis`, `object-detection` | [解析](parsed/2026-arxiv-cognitive-yolo.md) | 补完整候选/失败/LLM/GPU 预算，并以 fixed-recipe random/evolution/stateless/memory-aware 对照复核 |
+| codex_draft | [LEMUR 2: Unlocking Neural Network Diversity for AI](https://arxiv.org/abs/2607.06839) | 2026/arXiv | `llm-nas`, `benchmark`, `hardware-aware`, `real-device` | [解析](parsed/2026-arxiv-lemur2.md) | 审计公开数据库 provenance，筛出同任务同配方子集并复核 Android/Unity 测量协议 |
 | codex_draft | [LLM-Driven Composite Neural Architecture Search for Multi-Source RL State Encoding](https://arxiv.org/abs/2512.06982) | 2025/NeurIPS LAW Workshop | `llm-nas`, `composite-architecture`, `transformer`, `reinforcement-learning` | [解析](parsed/2025-neuripsw-lacer-composite-nas.md) | 用同一 base LLM、相同 attempted/evaluated/GPU budget 复现 richer-feedback 消融，并公开 schema、失败记账与完整成本 |
 | codex_draft | [Convergence Theory for Iterative LLM-Based Neural Architecture Search: A Parametric Cross-Entropy Framework with Closed-Form Proxy Reliability](https://arxiv.org/abs/2605.30103) | 2026/arXiv | `llm-nas`, `theory`, `proxy-fidelity`, `convergence` | [解析](parsed/2026-arxiv-convergence-theory-llm-nas.md) | 在单一任务和固定typed space内重算proxy SNR与finite-budget convergence；补multi-seed、完整manifest和可验证proof条件 |
 | codex_draft | [AgenticRS-EnsNAS: Ensemble-Decoupled Self-Evolving Architecture Search](https://arxiv.org/abs/2603.20014) | 2026/arXiv | `llm-nas`, `theory`, `ensemble`, `acceptance-criterion` | [解析](parsed/2026-arxiv-agenticrs-ensnas.md) | 等待公开代码/benchmark；先修正Delta-E符号并用variance-aware置信gate做matched-budget复核 |
@@ -43,6 +45,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [GenomeHarness: Harnessing AI Agents for Reliable Adaptation of Genome Language Models](https://arxiv.org/abs/2608.21916) | 2026/arXiv | `hpo`, `fixed-architecture`, `mcts`, `agent-harness` | [解析](parsed/2026-arxiv-genomeharness.md) | 在同一 fixed backbone 上补 random/TPE/CMA-ES/pure-LLM matched-budget 与多 search-seed 对照 |
 | codex_draft | [Using Large Language Models for Hyperparameter Optimization](https://arxiv.org/abs/2312.04528) | 2023/arXiv | `hpo` | [解析](parsed/2023-arxiv-llm-hpo.md) · [PDF](pdfs/2312.04528-llm-hpo.pdf) | 核对预算与 BO 对比 |
 | codex_draft | [AgentHPO: Large Language Model Agent for Hyper-Parameter Optimization](https://arxiv.org/abs/2402.01881) | 2025/CPAL | `hpo` | [解析](parsed/2024-cpal-agenthpo.md) · [PDF](pdfs/2402.01881-agenthpo.pdf) | 人工复核 T5-Small Table 3 与 5/10-run 口径 |
 | codex_draft | [Large Language Models to Enhance Bayesian Optimization](https://arxiv.org/abs/2402.03921) | 2024/ICLR | `hpo` | [解析](parsed/2024-iclr-llambo.md) · [PDF](pdfs/2402.03921-llambo.pdf) | 复用 LLM + BO 基线设计 |
@@ -57,6 +60,10 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [NOVA: A Verification-Aware Agent Harness for Architecture Evolution in Industrial Recommender Systems](https://arxiv.org/abs/2606.27243) | 2026/arXiv v3 | `llm-nas`, `recommender`, `mixed-search-space`, `verification` | [解析](parsed/2026-arxiv-nova.md) | 冻结 architecture-only 子空间，并匹配 offline eval、LLM、GPU 与墙钟预算复核 |
+| codex_draft | [Self-Evolving Recommendation System: End-To-End Autonomous Model Optimization With LLM Agents](https://arxiv.org/abs/2602.10226) | 2026/RecSys | `llm-agent`, `recommender`, `mixed-search-space`, `production` | [解析](parsed/2026-recsys-self-evolving-recommendation.md) | 将 architecture/recipe/reward 三轨拆开，并补 attempted/failed/重复与计算成本账本 |
+| codex_draft | [Agentic Bayesian Optimization through Surrogate-Augmented Autoresearch](https://arxiv.org/abs/2608.00316) | 2026/arXiv v2 | `agentic-bo`, `hpo`, `mixed-search-space`, `pareto` | [解析](parsed/2026-arxiv-agentic-bayesian-optimization.md) | 固定 LCBench 层数/宽度后重跑 HPO，并匹配 tokens/backend calls/墙钟成本 |
+| codex_draft | [Evolving Executable Pipeline Programs for AutoML with Language Models](https://arxiv.org/abs/2608.16416) | 2026/arXiv | `automl`, `program-evolution`, `mixed-search-space` | [解析](parsed/2026-arxiv-lace-automl.md) | 保留 attempted/invalid/unique-signature 协议；不要把 pipeline search 写成 NAS |
 | codex_draft | [AgentHPOBench: A Benchmark For Evaluating LLM Agents as Sequential Hyperparameter Optimizers](https://arxiv.org/abs/2607.29626) | 2026/arXiv | `hpo`, `benchmark`, `sequential-agent`, `mixed-search-space`, `test-feedback` | [解析](parsed/2026-arxiv-agenthpobench.md) | 按 architecture-only/HPO-only/mixed 拆分任务，改为 validation-only，统一可见信息并同时报告 final-step 与 best-so-far |
 | codex_draft | [When Is an LLM Worth It for Hyperparameter Optimization?](https://arxiv.org/abs/2606.21641) | 2026/arXiv v2 | `hpo`, `budget-matching`, `warm-start`, `classical-baseline`, `mixed-search-space` | [解析](parsed/2026-arxiv-budget-matched-llm-hpo.md) | 获取作者代码；在固定架构上以同一 default、5+ seeds、12-trial matched budget 复现 random/TPE 与 LLM |
 | codex_draft | [Bayesian Optimization with Rich Auxiliary Information via LLMs](https://arxiv.org/abs/2609.19437) | 2026/arXiv | `hpo`, `bayesian-optimization`, `llm-prior`, `mixed-search-space` | [解析](parsed/2026-arxiv-rich-auxiliary-llm-bo.md) | 固定结构字段并公开 base LLM、prior query budget、N/n/beta/sigma、tokens/费用；用完整任务表复现 validation-only HPO |
@@ -74,6 +81,14 @@
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
 | codex_draft | [AutoLLMResearch: Training Research Agents for Automating LLM Experiment Configuration](https://arxiv.org/abs/2605.11518) | 2026/arXiv | `hpo`, `transformer`, `multi-fidelity` | [解析](parsed/2026-arxiv-autollmresearch.md) · [PDF](pdfs/2605.11518-autollmresearch.pdf) | 分别复现 architecture 与 training-HPO 任务 |
+
+## 相邻方法：NAS Evaluator / Proxy Discovery
+
+这类方法优化架构评分器或代理程序，而不是直接提出神经架构；其 discovery 成本必须与下游架构搜索成本分开。
+
+| Status | Paper | Year/Venue | Tags | Note | Next action |
+|---|---|---|---|---|---|
+| codex_draft | [Bi-EZP: LLM-Guided Bilevel Program Evolution for Ensemble Zero-Cost Proxy Discovery](https://arxiv.org/abs/2608.21927) | 2026/arXiv | `llm-nas`, `zero-cost-proxy`, `program-evolution`, `cma-es` | [解析](parsed/2026-arxiv-bi-ezp.md) | 多 seed 复核 proxy fidelity，并统一计入 LLM/CMA-ES/proxy extraction 与下游 search 成本 |
 
 ## 邻接基准：MLE Agent
 
