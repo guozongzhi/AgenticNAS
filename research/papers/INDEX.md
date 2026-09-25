@@ -82,6 +82,15 @@
 |---|---|---|---|---|---|
 | codex_draft | [AutoLLMResearch: Training Research Agents for Automating LLM Experiment Configuration](https://arxiv.org/abs/2605.11518) | 2026/arXiv | `hpo`, `transformer`, `multi-fidelity` | [解析](parsed/2026-arxiv-autollmresearch.md) · [PDF](pdfs/2605.11518-autollmresearch.pdf) | 分别复现 architecture 与 training-HPO 任务 |
 
+## 相邻方法：传统多目标与硬件感知 NAS 基线
+
+这些方法搜索真实神经架构，但不使用 LLM/Agent；只用于协议、硬件闭环和 Pareto baseline 设计，不能支持 Agent policy 效果结论。
+
+| Status | Paper | Year/Venue | Tags | Note | Next action |
+|---|---|---|---|---|---|
+| codex_draft | [FINNAS: FINN-Guided Hardware-Aware NAS and Pruning for FPGA Jet Substructure Classification](https://arxiv.org/abs/2609.16367) | 2026/ICECS | `nas`, `evolutionary`, `hardware-aware`, `fpga` | [解析](parsed/2026-icecs-finnas.md) | 补 random/accuracy-only/Pareto matched-budget 与多 search seeds，并完整报告 proxy/真实硬件/训练成本 |
+| codex_draft | [Efficient Hessian-Free Methods for Multi-Objective Bilevel Optimization with Nonconvex Lower Level](https://arxiv.org/abs/2608.12704) | 2026/arXiv v3 | `nas`, `multi-objective`, `darts`, `hypervolume` | [解析](parsed/2026-arxiv-momeha-multi-objective-nas.md) | 获取代码并补最终离散架构、多 seed、真实设备指标和统一 GPU/墙钟预算 |
+
 ## 相邻方法：NAS Evaluator / Proxy Discovery
 
 这类方法优化架构评分器或代理程序，而不是直接提出神经架构；其 discovery 成本必须与下游架构搜索成本分开。
@@ -96,6 +105,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [An LLM-Assisted AutoML Framework for Intrusion Detection in IoT Networks](https://arxiv.org/abs/2609.23097) | 2026/arXiv | `automl-agent`, `hpo`, `cash`, `bounded-policy` | [解析](parsed/2026-arxiv-llm-assisted-automl-iot-ids.md) | 固定数据处理、feature space 和模型族后，与 random/TPE/CMA-ES/pure LLM 做多 seed matched-budget 复核 |
 | codex_draft | [MLAgentBench: Evaluating Language Agents on Machine Learning Experimentation](https://arxiv.org/abs/2310.03302) | 2023/arXiv | `benchmark`, `mle-agent` | [解析](parsed/2023-arxiv-mlagentbench.md) · [PDF](pdfs/2310.03302-mlagentbench.pdf) | 将失败类型纳入 Agent 评测 |
 
 ## 状态定义
