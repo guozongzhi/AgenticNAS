@@ -8,6 +8,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [EvoTreeNAD: Genealogy-Guided Evolution for LLM-Driven Neural Architecture Discovery](https://arxiv.org/abs/2609.29016) | 2026/arXiv | `llm-nas`, `evolution`, `genealogy`, `memory` | [解析](parsed/2026-arxiv-evotreenad.md) | 获取官方代码/trajectory；把开放式代码生成收敛到 typed Conv1d space，并与 random/native/stateless/memory-aware 做 matched-budget 多 seed 复核 |
 | codex_draft | [Cognitive-YOLO: LLM-Driven Architecture Synthesis from First Principles of Data for Object Detection](https://arxiv.org/abs/2512.12281) | 2026/arXiv v2 | `llm-nas`, `architecture-synthesis`, `object-detection` | [解析](parsed/2026-arxiv-cognitive-yolo.md) | 补完整候选/失败/LLM/GPU 预算，并以 fixed-recipe random/evolution/stateless/memory-aware 对照复核 |
 | codex_draft | [LEMUR 2: Unlocking Neural Network Diversity for AI](https://arxiv.org/abs/2607.06839) | 2026/arXiv | `llm-nas`, `benchmark`, `hardware-aware`, `real-device` | [解析](parsed/2026-arxiv-lemur2.md) | 审计公开数据库 provenance，筛出同任务同配方子集并复核 Android/Unity 测量协议 |
 | codex_draft | [LLM-Driven Composite Neural Architecture Search for Multi-Source RL State Encoding](https://arxiv.org/abs/2512.06982) | 2025/NeurIPS LAW Workshop | `llm-nas`, `composite-architecture`, `transformer`, `reinforcement-learning` | [解析](parsed/2025-neuripsw-lacer-composite-nas.md) | 用同一 base LLM、相同 attempted/evaluated/GPU budget 复现 richer-feedback 消融，并公开 schema、失败记账与完整成本 |
@@ -60,6 +61,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Agentic Search Spaces for Tabular Machine Learning](https://arxiv.org/abs/2609.16309) | 2026/arXiv | `llm-agent`, `hpo`, `mixed-search-space`, `tabular` | [解析](parsed/2026-arxiv-agentic-search-spaces-tabular.md) | 分离 architecture/training/data/inference axes；按 wall-time/GPU/token 匹配并补 failed-trial ledger |
 | codex_draft | [NOVA: A Verification-Aware Agent Harness for Architecture Evolution in Industrial Recommender Systems](https://arxiv.org/abs/2606.27243) | 2026/arXiv v3 | `llm-nas`, `recommender`, `mixed-search-space`, `verification` | [解析](parsed/2026-arxiv-nova.md) | 冻结 architecture-only 子空间，并匹配 offline eval、LLM、GPU 与墙钟预算复核 |
 | codex_draft | [Self-Evolving Recommendation System: End-To-End Autonomous Model Optimization With LLM Agents](https://arxiv.org/abs/2602.10226) | 2026/RecSys | `llm-agent`, `recommender`, `mixed-search-space`, `production` | [解析](parsed/2026-recsys-self-evolving-recommendation.md) | 将 architecture/recipe/reward 三轨拆开，并补 attempted/failed/重复与计算成本账本 |
 | codex_draft | [Agentic Bayesian Optimization through Surrogate-Augmented Autoresearch](https://arxiv.org/abs/2608.00316) | 2026/arXiv v2 | `agentic-bo`, `hpo`, `mixed-search-space`, `pareto` | [解析](parsed/2026-arxiv-agentic-bayesian-optimization.md) | 固定 LCBench 层数/宽度后重跑 HPO，并匹配 tokens/backend calls/墙钟成本 |
@@ -88,6 +90,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [ENAS: An Efficient Hardware-Aware Neural Architecture Search Framework for TinyML on Resource-Constrained Microcontrollers](https://arxiv.org/abs/2609.30272) | 2026/arXiv | `nas`, `hardware-aware`, `tinyml`, `memory` | [解析](parsed/2026-arxiv-enas-tinyml.md) | 补 time-matched extended search、cache/invalid ledger 与真实 on-board latency/energy，再映射到 Conv1d typed baseline |
 | codex_draft | [FINNAS: FINN-Guided Hardware-Aware NAS and Pruning for FPGA Jet Substructure Classification](https://arxiv.org/abs/2609.16367) | 2026/ICECS | `nas`, `evolutionary`, `hardware-aware`, `fpga` | [解析](parsed/2026-icecs-finnas.md) | 补 random/accuracy-only/Pareto matched-budget 与多 search seeds，并完整报告 proxy/真实硬件/训练成本 |
 | codex_draft | [Efficient Hessian-Free Methods for Multi-Objective Bilevel Optimization with Nonconvex Lower Level](https://arxiv.org/abs/2608.12704) | 2026/arXiv v3 | `nas`, `multi-objective`, `darts`, `hypervolume` | [解析](parsed/2026-arxiv-momeha-multi-objective-nas.md) | 获取代码并补最终离散架构、多 seed、真实设备指标和统一 GPU/墙钟预算 |
 
