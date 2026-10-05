@@ -101,6 +101,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Coverage You Can Steer: Online Conformal Calibration for RL-Driven Hardware-Aware NAS](https://arxiv.org/abs/2610.03127) | 2026/arXiv | `nas`, `hardware-aware`, `conformal-prediction`, `evaluation-filter` | [解析](parsed/2026-arxiv-online-conformal-hw-nas.md) | 等待源码发布；在真实设备 latency/memory/energy 上复核 false-discard、Pareto/hypervolume 与端到端成本 |
 | codex_draft | [LESS: Lightweight Evolutionary Supernet Search in Minutes](https://arxiv.org/abs/2610.01468) | 2026/arXiv | `nas`, `evolutionary`, `weight-sharing`, `calibration`, `duplicate-control` | [解析](parsed/2026-arxiv-less.md) | 等待作者仓库可访问；复核 proposal ledger，并把 600-epoch retraining 纳入端到端成本 |
 | codex_draft | [ENAS: An Efficient Hardware-Aware Neural Architecture Search Framework for TinyML on Resource-Constrained Microcontrollers](https://arxiv.org/abs/2609.30272) | 2026/arXiv | `nas`, `hardware-aware`, `tinyml`, `memory` | [解析](parsed/2026-arxiv-enas-tinyml.md) | 补 time-matched extended search、cache/invalid ledger 与真实 on-board latency/energy，再映射到 Conv1d typed baseline |
 | codex_draft | [FINNAS: FINN-Guided Hardware-Aware NAS and Pruning for FPGA Jet Substructure Classification](https://arxiv.org/abs/2609.16367) | 2026/ICECS | `nas`, `evolutionary`, `hardware-aware`, `fpga` | [解析](parsed/2026-icecs-finnas.md) | 补 random/accuracy-only/Pareto matched-budget 与多 search seeds，并完整报告 proxy/真实硬件/训练成本 |
