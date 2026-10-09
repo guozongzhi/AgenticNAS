@@ -8,6 +8,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [EvoCast: Reliable Autonomous Research Agents for Iterative Forecasting Architecture Evolution](https://arxiv.org/abs/2610.04517) | 2026/arXiv | `llm-nas`, `time-series`, `memory`, `failure-ledger` | [解析](parsed/2026-arxiv-evocast.md) | 将开放代码编辑收敛为 typed Conv1d 动作；按 attempted/valid/trained/GPU/token/墙钟预算复核 stateless/memory-aware 对照 |
+| codex_draft | [Agentic Discovery of Neural Architectures: AIRA-Compose and AIRA-Design](https://arxiv.org/abs/2605.15871) | 2026/arXiv v2 | `llm-nas`, `foundation-model`, `transformer`, `mamba`, `mixed-search-space` | [解析](parsed/2026-arxiv-aira-compose-design.md) | 锁定代码/manifest；分离 Compose 结构搜索与 Design 训练脚本优化，并补 attempted/duplicate/LLM/GPU/设备成本 |
 | codex_draft | [AutoBCI: Forecast-Guided Agentic Neural Architecture Discovery for EEG-Based Brain--Computer Interfaces](https://arxiv.org/abs/2609.35456) | 2026/arXiv | `llm-nas`, `eeg`, `forecasting`, `code-generation` | [解析](parsed/2026-arxiv-autobci.md) | 等待代码/配置发布；按 attempted/eligible/trained 与 GPU/LLM 成本重建 stateless/memory-aware matched-budget 对照 |
 | codex_draft | [Large Language Model-Guided Evolutionary Discovery of Native Neural Architectures for Spiking Sequence Modeling](https://arxiv.org/abs/2609.40258) | 2026/arXiv | `llm-nas`, `evolution`, `spiking`, `surrogate`, `novelty` | [解析](parsed/2026-arxiv-openarchevo.md) | 等待代码/架构程序；改用 validation-only fitness，并补 random/stateless/memory-aware 多 seed 等预算复核 |
 | codex_draft | [EvoTreeNAD: Genealogy-Guided Evolution for LLM-Driven Neural Architecture Discovery](https://arxiv.org/abs/2609.29016) | 2026/arXiv | `llm-nas`, `evolution`, `genealogy`, `memory` | [解析](parsed/2026-arxiv-evotreenad.md) | 获取官方代码/trajectory；把开放式代码生成收敛到 typed Conv1d space，并与 random/native/stateless/memory-aware 做 matched-budget 多 seed 复核 |
@@ -101,6 +103,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Evolve on the Host, Predict on the Edge](https://arxiv.org/abs/2610.10038) | 2026/arXiv | `nas`, `neuroevolution`, `recurrent-network`, `real-device`, `energy` | [解析](parsed/2026-arxiv-one-nas-edge.md) | 复核 Pi latency/INA219 energy；补 host search CPU-hours、peak memory、Pareto archive 与 matched proposer budget |
+| codex_draft | [Bayesian Optimization in Sequence-to-Architecture Latent Space for Zero-Shot NAS](https://arxiv.org/abs/2610.06167) | 2026/arXiv | `nas`, `bayesian-optimization`, `zero-shot`, `latent-space` | [解析](parsed/2026-arxiv-seq2arch-bo-nas.md) | 多 search seed 复核；把 VAE pretraining、retry/invalid/duplicate 与最终训练计入端到端预算 |
 | codex_draft | [Coverage You Can Steer: Online Conformal Calibration for RL-Driven Hardware-Aware NAS](https://arxiv.org/abs/2610.03127) | 2026/arXiv | `nas`, `hardware-aware`, `conformal-prediction`, `evaluation-filter` | [解析](parsed/2026-arxiv-online-conformal-hw-nas.md) | 等待源码发布；在真实设备 latency/memory/energy 上复核 false-discard、Pareto/hypervolume 与端到端成本 |
 | codex_draft | [LESS: Lightweight Evolutionary Supernet Search in Minutes](https://arxiv.org/abs/2610.01468) | 2026/arXiv | `nas`, `evolutionary`, `weight-sharing`, `calibration`, `duplicate-control` | [解析](parsed/2026-arxiv-less.md) | 等待作者仓库可访问；复核 proposal ledger，并把 600-epoch retraining 纳入端到端成本 |
 | codex_draft | [ENAS: An Efficient Hardware-Aware Neural Architecture Search Framework for TinyML on Resource-Constrained Microcontrollers](https://arxiv.org/abs/2609.30272) | 2026/arXiv | `nas`, `hardware-aware`, `tinyml`, `memory` | [解析](parsed/2026-arxiv-enas-tinyml.md) | 补 time-matched extended search、cache/invalid ledger 与真实 on-board latency/energy，再映射到 Conv1d typed baseline |
@@ -113,6 +117,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Evolutionary One-Step Generators: Fast and Diverse Sampling for Discrete Design](https://arxiv.org/abs/2610.08367) | 2026/arXiv | `nas`, `proposal-generator`, `evolutionary-strategy`, `duplication-control` | [解析](parsed/2026-arxiv-evolutionary-one-step-generators.md) | 以 matched objective-evaluation/wall-time 复核 canonical-hash valid-and-unique yield，并把 generator training 摊入成本 |
 | codex_draft | [Bi-EZP: LLM-Guided Bilevel Program Evolution for Ensemble Zero-Cost Proxy Discovery](https://arxiv.org/abs/2608.21927) | 2026/arXiv | `llm-nas`, `zero-cost-proxy`, `program-evolution`, `cma-es` | [解析](parsed/2026-arxiv-bi-ezp.md) | 多 seed 复核 proxy fidelity，并统一计入 LLM/CMA-ES/proxy extraction 与下游 search 成本 |
 
 ## 邻接基准：MLE Agent
