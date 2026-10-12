@@ -8,6 +8,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Neural Architecture Discovery via Autonomous Evolution](https://arxiv.org/abs/2507.18074) | 2026/COLM | `llm-nas`, `autonomous-research`, `memory`, `code-generation` | [解析](parsed/2026-colm-asi-arch.md) | 固化 typed architecture-only 子空间；补完整 reject/retry/trained ledger、LLM 成本、多 search seeds 与真实设备 Pareto |
 | codex_draft | [EvoCast: Reliable Autonomous Research Agents for Iterative Forecasting Architecture Evolution](https://arxiv.org/abs/2610.04517) | 2026/arXiv | `llm-nas`, `time-series`, `memory`, `failure-ledger` | [解析](parsed/2026-arxiv-evocast.md) | 将开放代码编辑收敛为 typed Conv1d 动作；按 attempted/valid/trained/GPU/token/墙钟预算复核 stateless/memory-aware 对照 |
 | codex_draft | [Agentic Discovery of Neural Architectures: AIRA-Compose and AIRA-Design](https://arxiv.org/abs/2605.15871) | 2026/arXiv v2 | `llm-nas`, `foundation-model`, `transformer`, `mamba`, `mixed-search-space` | [解析](parsed/2026-arxiv-aira-compose-design.md) | 锁定代码/manifest；分离 Compose 结构搜索与 Design 训练脚本优化，并补 attempted/duplicate/LLM/GPU/设备成本 |
 | codex_draft | [AutoBCI: Forecast-Guided Agentic Neural Architecture Discovery for EEG-Based Brain--Computer Interfaces](https://arxiv.org/abs/2609.35456) | 2026/arXiv | `llm-nas`, `eeg`, `forecasting`, `code-generation` | [解析](parsed/2026-arxiv-autobci.md) | 等待代码/配置发布；按 attempted/eligible/trained 与 GPU/LLM 成本重建 stateless/memory-aware matched-budget 对照 |
@@ -65,6 +66,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Active-DiNTS: Active Differentiable Network Topology Search](https://arxiv.org/abs/2610.04787) | 2026/arXiv | `nas`, `active-learning`, `mixed-search-space`, `peak-memory` | [解析](parsed/2026-arxiv-active-dints.md) | 将 data acquisition 与 architecture search 拆轨；补实际源码、matched rerun、attempted/failed 与真实 endpoint 成本 |
+| codex_draft | [Evolutionary Architecture Search for Chlorophyll-a Prediction in Lakes using Sentinel-2](https://arxiv.org/abs/2610.10496) | 2026/AutoML4EO workshop | `nas`, `mixed-search-space`, `tiny-mlp`, `evolution` | [解析](parsed/2026-arxiv-chlorophyll-mlp-mixed-search.md) | 拆成 architecture-only/recipe-only matched-budget 两轨，并补真机 latency/memory/energy |
 | codex_draft | [PINNMorph: Evolving Online Adaptation Policies for Physics-Informed Neural Networks](https://arxiv.org/abs/2609.32685) | 2026/arXiv | `automl-agent`, `mixed-search-space`, `online-adaptation`, `pinn` | [解析](parsed/2026-arxiv-pinnmorph.md) | 将 topology/loss/sampling/optimizer 动作拆轨，并补 valid/rollback/duplicate 与硬件成本账本 |
 | codex_draft | [Agentic Search Spaces for Tabular Machine Learning](https://arxiv.org/abs/2609.16309) | 2026/arXiv | `llm-agent`, `hpo`, `mixed-search-space`, `tabular` | [解析](parsed/2026-arxiv-agentic-search-spaces-tabular.md) | 分离 architecture/training/data/inference axes；按 wall-time/GPU/token 匹配并补 failed-trial ledger |
 | codex_draft | [NOVA: A Verification-Aware Agent Harness for Architecture Evolution in Industrial Recommender Systems](https://arxiv.org/abs/2606.27243) | 2026/arXiv v3 | `llm-nas`, `recommender`, `mixed-search-space`, `verification` | [解析](parsed/2026-arxiv-nova.md) | 冻结 architecture-only 子空间，并匹配 offline eval、LLM、GPU 与墙钟预算复核 |
@@ -95,6 +98,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [A Closer Look at Agentic BBO: Benchmarking LLM Agents for Black-Box Optimization](https://arxiv.org/abs/2610.12183) | 2026/arXiv | `agentic-bo`, `benchmark`, `hpo`, `fixed-budget`, `failure-handling` | [解析](parsed/2026-arxiv-agenticbbo-bench.md) | 锁定 fixed architecture；匹配 attempted/evaluated/tokens/wall-time，并公开 invalid/retry/termination ledger |
 | codex_draft | [Agentic High-Dimensional Bayesian Optimization with Hypothesis- and Evidence-Guided Search](https://arxiv.org/abs/2609.34281) | 2026/arXiv | `agentic-bo`, `high-dimensional`, `hybrid`, `strategy-selection` | [解析](parsed/2026-arxiv-hera-agentic-hdbo.md) | 等待可运行代码；在 fixed-architecture HPO 上统一 100 attempted trials、tokens、墙钟和失败账本复核 |
 
 ## 相邻方法：传统 NAS、多目标与硬件感知基线
@@ -103,6 +107,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Forecast Accuracy Is Not Trading Profit: Evolving Small Recurrent Networks for Stock Return Prediction](https://arxiv.org/abs/2610.07825) | 2026/arXiv | `nas`, `neuroevolution`, `small-model`, `real-device`, `energy` | [解析](parsed/2026-arxiv-small-recurrent-stock-nas.md) | 获取代码；补 per-inference energy、peak memory、duplicates/failures、多 search seeds 与 matched proposer budget |
 | codex_draft | [Evolve on the Host, Predict on the Edge](https://arxiv.org/abs/2610.10038) | 2026/arXiv | `nas`, `neuroevolution`, `recurrent-network`, `real-device`, `energy` | [解析](parsed/2026-arxiv-one-nas-edge.md) | 复核 Pi latency/INA219 energy；补 host search CPU-hours、peak memory、Pareto archive 与 matched proposer budget |
 | codex_draft | [Bayesian Optimization in Sequence-to-Architecture Latent Space for Zero-Shot NAS](https://arxiv.org/abs/2610.06167) | 2026/arXiv | `nas`, `bayesian-optimization`, `zero-shot`, `latent-space` | [解析](parsed/2026-arxiv-seq2arch-bo-nas.md) | 多 search seed 复核；把 VAE pretraining、retry/invalid/duplicate 与最终训练计入端到端预算 |
 | codex_draft | [Coverage You Can Steer: Online Conformal Calibration for RL-Driven Hardware-Aware NAS](https://arxiv.org/abs/2610.03127) | 2026/arXiv | `nas`, `hardware-aware`, `conformal-prediction`, `evaluation-filter` | [解析](parsed/2026-arxiv-online-conformal-hw-nas.md) | 等待源码发布；在真实设备 latency/memory/energy 上复核 false-discard、Pareto/hypervolume 与端到端成本 |
