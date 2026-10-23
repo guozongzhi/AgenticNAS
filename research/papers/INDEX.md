@@ -51,6 +51,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [FGSS-BO: Feedback-Guided Hypothesis Management for LLM-Based Bayesian Optimization](https://arxiv.org/abs/2610.21246) | 2026/arXiv | `hpo`, `fixed-architecture`, `llm`, `reflection`, `memory` | [解析](parsed/2026-arxiv-fgss-bo-hpo.md) | 在固定 Conv1d backbone 上复核结构化 hypothesis memory；匹配 objective evaluations、LLM tokens、墙钟与失败账本 |
 | codex_draft | [GenomeHarness: Harnessing AI Agents for Reliable Adaptation of Genome Language Models](https://arxiv.org/abs/2608.21916) | 2026/arXiv | `hpo`, `fixed-architecture`, `mcts`, `agent-harness` | [解析](parsed/2026-arxiv-genomeharness.md) | 在同一 fixed backbone 上补 random/TPE/CMA-ES/pure-LLM matched-budget 与多 search-seed 对照 |
 | codex_draft | [Using Large Language Models for Hyperparameter Optimization](https://arxiv.org/abs/2312.04528) | 2023/arXiv | `hpo` | [解析](parsed/2023-arxiv-llm-hpo.md) · [PDF](pdfs/2312.04528-llm-hpo.pdf) | 核对预算与 BO 对比 |
 | codex_draft | [AgentHPO: Large Language Model Agent for Hyper-Parameter Optimization](https://arxiv.org/abs/2402.01881) | 2025/CPAL | `hpo` | [解析](parsed/2024-cpal-agenthpo.md) · [PDF](pdfs/2402.01881-agenthpo.pdf) | 人工复核 T5-Small Table 3 与 5/10-run 口径 |
@@ -66,6 +67,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Efficiently Estimating Optimal Hyperparameter Scaling Laws through Power-Law Entropy Search](https://arxiv.org/abs/2609.01431) | 2026/arXiv v3 | `mixed-search-space`, `bayesian-optimization`, `scaling-law`, `multi-fidelity` | [解析](parsed/2026-arxiv-ples-scaling-law-hpo.md) | 分离模型规模、数据 fidelity 与训练 HPO；把 ND proxy 换成 GPU-hours/墙钟实测复核 |
 | codex_draft | [Active-DiNTS: Active Differentiable Network Topology Search](https://arxiv.org/abs/2610.04787) | 2026/arXiv | `nas`, `active-learning`, `mixed-search-space`, `peak-memory` | [解析](parsed/2026-arxiv-active-dints.md) | 将 data acquisition 与 architecture search 拆轨；补实际源码、matched rerun、attempted/failed 与真实 endpoint 成本 |
 | codex_draft | [Evolutionary Architecture Search for Chlorophyll-a Prediction in Lakes using Sentinel-2](https://arxiv.org/abs/2610.10496) | 2026/AutoML4EO workshop | `nas`, `mixed-search-space`, `tiny-mlp`, `evolution` | [解析](parsed/2026-arxiv-chlorophyll-mlp-mixed-search.md) | 拆成 architecture-only/recipe-only matched-budget 两轨，并补真机 latency/memory/energy |
 | codex_draft | [PINNMorph: Evolving Online Adaptation Policies for Physics-Informed Neural Networks](https://arxiv.org/abs/2609.32685) | 2026/arXiv | `automl-agent`, `mixed-search-space`, `online-adaptation`, `pinn` | [解析](parsed/2026-arxiv-pinnmorph.md) | 将 topology/loss/sampling/optimizer 动作拆轨，并补 valid/rollback/duplicate 与硬件成本账本 |
@@ -101,6 +103,15 @@
 | codex_draft | [A Closer Look at Agentic BBO: Benchmarking LLM Agents for Black-Box Optimization](https://arxiv.org/abs/2610.12183) | 2026/arXiv | `agentic-bo`, `benchmark`, `hpo`, `fixed-budget`, `failure-handling` | [解析](parsed/2026-arxiv-agenticbbo-bench.md) | 锁定 fixed architecture；匹配 attempted/evaluated/tokens/wall-time，并公开 invalid/retry/termination ledger |
 | codex_draft | [Agentic High-Dimensional Bayesian Optimization with Hypothesis- and Evidence-Guided Search](https://arxiv.org/abs/2609.34281) | 2026/arXiv | `agentic-bo`, `high-dimensional`, `hybrid`, `strategy-selection` | [解析](parsed/2026-arxiv-hera-agentic-hdbo.md) | 等待可运行代码；在 fixed-architecture HPO 上统一 100 attempted trials、tokens、墙钟和失败账本复核 |
 
+## 相邻方法：参数与训练系统优化
+
+这类方法固定目标模型语义，但搜索 adapter 权重或分布式运行时 recipe，而不是神经架构或训练超参数；只借鉴预算、失败处理和控制面设计。
+
+| Status | Paper | Year/Venue | Tags | Note | Next action |
+|---|---|---|---|---|---|
+| codex_draft | [ATTUNE: Agentic Throughput Tuning for LLM Training](https://arxiv.org/abs/2610.17528) | 2026/arXiv | `agentic-systems-tuning`, `throughput`, `gpu-hours`, `failure-ledger` | [解析](parsed/2026-arxiv-attune-throughput-tuning.md) | 复用 objective-preserving gate、重复拒绝与失败收费；补 LLM tokens、peak memory 和 energy |
+| codex_draft | [How Low Can You Go: Fine-Tuning LLMs with Bayesian Optimization (LlMBO)](https://arxiv.org/abs/2610.18504) | 2026/arXiv | `bayesian-optimization`, `parameter-search`, `peft`, `memory` | [解析](parsed/2026-arxiv-llmbo-low-dimensional-finetuning.md) | 将 parameter search 与 recipe HPO 分轨；匹配 completions、initial design、GPU-hours 与 wall-time |
+
 ## 相邻方法：传统 NAS、多目标与硬件感知基线
 
 这些方法搜索真实神经架构，但不使用 LLM/Agent；只用于协议、硬件闭环和 Pareto baseline 设计，不能支持 Agent policy 效果结论。
@@ -131,6 +142,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Tree-Structured Synergy of Large Language Models and Bayesian Optimization for Efficient CASH](https://arxiv.org/abs/2601.12355) | 2026/NeurIPS | `automl-agent`, `cash`, `mcts`, `memory`, `reflection` | [解析](parsed/2026-neurips-lb-mcts-cash.md) | 固定算法族后复核短期记忆与 proposer 切换；补 attempted/failed/tokens/wall-time 完整账本 |
 | codex_draft | [An LLM-Assisted AutoML Framework for Intrusion Detection in IoT Networks](https://arxiv.org/abs/2609.23097) | 2026/arXiv | `automl-agent`, `hpo`, `cash`, `bounded-policy` | [解析](parsed/2026-arxiv-llm-assisted-automl-iot-ids.md) | 固定数据处理、feature space 和模型族后，与 random/TPE/CMA-ES/pure LLM 做多 seed matched-budget 复核 |
 | codex_draft | [MLAgentBench: Evaluating Language Agents on Machine Learning Experimentation](https://arxiv.org/abs/2310.03302) | 2023/arXiv | `benchmark`, `mle-agent` | [解析](parsed/2023-arxiv-mlagentbench.md) · [PDF](pdfs/2310.03302-mlagentbench.pdf) | 将失败类型纳入 Agent 评测 |
 
