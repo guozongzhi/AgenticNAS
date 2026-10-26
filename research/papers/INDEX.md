@@ -100,6 +100,8 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [An important Bottleneck in LLM Optimizers: Principle-Level Local Optima](https://arxiv.org/abs/2610.24291) | 2026/arXiv v2 | `llm-optimizer`, `feedback`, `diversity-collapse`, `failure-ledger` | [解析](parsed/2026-arxiv-llm-principle-collapse.md) | 在 typed Conv1d space 记录 principle effective count、dominant family 与 plateau remaining budget，并做 novelty-gated matched-budget 对照 |
+| codex_draft | [Large Language Models Meet Bayesian Optimization: Towards Self-evolving Wireless Digital Twins](https://arxiv.org/abs/2610.31192) | 2026/arXiv | `agentic-bo`, `kernel-discovery`, `evolution`, `memory` | [解析](parsed/2026-arxiv-llm-bo-wireless-digital-twins.md) | 补 kernel attempted/valid、LLM calls/tokens、失败与墙钟账本；在固定 BO backbone 下做 matched-cost 对照 |
 | codex_draft | [A Closer Look at Agentic BBO: Benchmarking LLM Agents for Black-Box Optimization](https://arxiv.org/abs/2610.12183) | 2026/arXiv | `agentic-bo`, `benchmark`, `hpo`, `fixed-budget`, `failure-handling` | [解析](parsed/2026-arxiv-agenticbbo-bench.md) | 锁定 fixed architecture；匹配 attempted/evaluated/tokens/wall-time，并公开 invalid/retry/termination ledger |
 | codex_draft | [Agentic High-Dimensional Bayesian Optimization with Hypothesis- and Evidence-Guided Search](https://arxiv.org/abs/2609.34281) | 2026/arXiv | `agentic-bo`, `high-dimensional`, `hybrid`, `strategy-selection` | [解析](parsed/2026-arxiv-hera-agentic-hdbo.md) | 等待可运行代码；在 fixed-architecture HPO 上统一 100 attempted trials、tokens、墙钟和失败账本复核 |
 
@@ -118,6 +120,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [QuaNAS: Uncertainty-Aware Reuse of Earlier Searches for Query-Efficient Neural Architecture Search](https://arxiv.org/abs/2610.31251) | 2026/arXiv | `nas`, `bayesian-optimization`, `transfer`, `archive`, `query-efficient` | [解析](parsed/2026-arxiv-quanas-reuse.md) | 将同-space archive prior 映射到 typed Conv1d；匹配 attempted/trained/GPU/墙钟并报告 prior mismatch 与 duplicate/invalid ledger |
 | codex_draft | [Forecast Accuracy Is Not Trading Profit: Evolving Small Recurrent Networks for Stock Return Prediction](https://arxiv.org/abs/2610.07825) | 2026/arXiv | `nas`, `neuroevolution`, `small-model`, `real-device`, `energy` | [解析](parsed/2026-arxiv-small-recurrent-stock-nas.md) | 获取代码；补 per-inference energy、peak memory、duplicates/failures、多 search seeds 与 matched proposer budget |
 | codex_draft | [Evolve on the Host, Predict on the Edge](https://arxiv.org/abs/2610.10038) | 2026/arXiv | `nas`, `neuroevolution`, `recurrent-network`, `real-device`, `energy` | [解析](parsed/2026-arxiv-one-nas-edge.md) | 复核 Pi latency/INA219 energy；补 host search CPU-hours、peak memory、Pareto archive 与 matched proposer budget |
 | codex_draft | [Bayesian Optimization in Sequence-to-Architecture Latent Space for Zero-Shot NAS](https://arxiv.org/abs/2610.06167) | 2026/arXiv | `nas`, `bayesian-optimization`, `zero-shot`, `latent-space` | [解析](parsed/2026-arxiv-seq2arch-bo-nas.md) | 多 search seed 复核；把 VAE pretraining、retry/invalid/duplicate 与最终训练计入端到端预算 |
