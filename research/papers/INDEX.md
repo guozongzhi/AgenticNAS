@@ -89,6 +89,14 @@
 | codex_draft | [Long-Horizon Autonomous Architecture Research with a Language-Model Agent: A Behavioural Case Study](https://arxiv.org/abs/2608.01995) | 2026/arXiv | `llm-nas`, `long-horizon`, `memory`, `mixed-search-space` | [解析](parsed/2026-arxiv-long-horizon-architecture-research.md) | 等待公开模型版本与训练代码，并做多 seed/多 workflow 对照 |
 | codex_draft | [Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch](https://arxiv.org/abs/2603.24647) | 2026/arXiv | `hpo`, `benchmark`, `hybrid`, `mixed-search-space` | [解析](parsed/2026-arxiv-llm-vs-classical-hpo.md) · [PDF](pdfs/2603.24647-llm-vs-classical-hpo.pdf) | 固定结构字段后再复现 TPE/CMA-ES/Centaur |
 
+## 相邻方法：传统 HPO 与多目标基线
+
+这些方法不使用 LLM/Agent；仅将真正固定架构的任务作为 HPO baseline，结构与训练字段混合的任务继续按 mixed-search-space 解释。
+
+| Status | Paper | Year/Venue | Tags | Note | Next action |
+|---|---|---|---|---|---|
+| codex_draft | [Multi-objective Hyperparameter Optimization with Expert Priors (PriMO)](https://arxiv.org/abs/2511.08371) | 2025/arXiv v2 | `hpo`, `multi-objective`, `multi-fidelity`, `expert-prior`, `mixed-search-space` | [解析](parsed/2025-arxiv-primo-multi-objective-hpo.md) | 只取 PD1 fixed-architecture 子集；把 100k prior construction 和在线 trials 一并计费，OpenCLIP/LCBench 单列 mixed |
+
 ## 相邻方法：跨 NAS/HPO 任务的多保真 Agent
 
 这类方法用统一 Agent 分别处理架构、训练超参或数据配置任务，但不在单个搜索空间里联合优化它们。
@@ -125,6 +133,9 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Evidence-Guided Neural Architecture Selection under Uncertainty for Subject-Specific Blood Glucose Forecasting (EVIDENT)](https://arxiv.org/abs/2606.05373) | 2026/arXiv v2 | `nas`, `bayesian-evidence`, `conv1d`, `time-series` | [解析](parsed/2026-arxiv-evident-time-series-nas.md) | 作为 3–7 block Conv1d baseline；匹配 attempted trials、GPU/墙钟和真实设备 latency/memory/energy |
+| codex_draft | [Evolved Spiking Neural Networks for EEG Seizure Detection](https://arxiv.org/abs/2611.03841) | 2026/arXiv | `nas`, `neuroevolution`, `spiking-neural-network`, `eeg` | [解析](parsed/2026-arxiv-evolved-snn-eeg-neuroevolution.md) | 获取代码；补 unique/invalid/failed、端到端墙钟与真实 neuromorphic latency/energy |
+| codex_draft | [Evolutionary Architecture Search through Grammar-Based Sequence Alignment](https://arxiv.org/abs/2512.04992) | 2025/arXiv v2 | `nas`, `evolution`, `grammar`, `crossover` | [解析](parsed/2025-arxiv-grammar-sequence-alignment-nas.md) | 复用 grammar-valid proposal；补 invalid/duplicate、训练成本，并以 matched budget 多 seed 复核 |
 | codex_draft | [AutoCompress: Automated Hardware-Guided Model Compression](https://arxiv.org/abs/2611.08290) | 2026/arXiv | `nas`, `differentiable-search`, `hardware-aware`, `real-device`, `peak-memory` | [解析](parsed/2026-arxiv-autocompress.md) | 复用 target-engine cost calibration；补 energy、多 search seeds、attempted/failed 与完整 GPU/墙钟账本 |
 | codex_draft | [MCUFlowNet: Hardware-Aware Neural Architecture Search for Optical Flow on Microcontrollers](https://arxiv.org/abs/2611.08147) | 2026/ISCAS under review | `nas`, `hardware-aware`, `pareto`, `microcontroller`, `real-device` | [解析](parsed/2026-arxiv-mcuflownet.md) | 将 macro memory gate/micro latency Pareto 映射到 typed Conv1d，并补 energy、search seeds 与 proposal ledger |
 | codex_draft | [TRON: Transferring Naturally Evolved Network Architectures into Neuroevolution](https://arxiv.org/abs/2610.35647) | 2026/arXiv | `nas`, `neuroevolution`, `biological-prior`, `quarantine` | [解析](parsed/2026-arxiv-tron-biological-neuroevolution.md) | 补完整 population/generations/evaluation/seed/硬件账本；消融 PPI prior、speciation 与 quarantine，并做 typed Conv1d matched-budget 复核 |
@@ -155,6 +166,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [NeoResearch: Literature- and Experience-Guided Autonomous Time Series Model Discovery](https://arxiv.org/abs/2611.18235) | 2026/arXiv | `mle-agent`, `automl-agent`, `mixed-search-space`, `memory`, `time-series` | [解析](parsed/2026-arxiv-neoresearch-time-series-model-discovery.md) | 拆开 architecture/recipe/data-code 轨；复用跨任务经验库，补 attempted/failure/duplicate 与 GPU/token/墙钟成本 |
 | codex_draft | [Agent Stack for ML Training Lifecycle: Generation, Validation, and Optimization](https://arxiv.org/abs/2611.00384) | 2026/arXiv | `mle-agent`, `automl-agent`, `mixed-search-space`, `production`, `memory` | [解析](parsed/2026-arxiv-linkedin-agent-stack.md) | 分离 architecture-only/recipe-only；复用 fixed-incumbent rounds、external ledger 与 failure repair，补 matched-budget 对照 |
 | codex_draft | [AutoRSE: Evaluating LLM Agents as Recommendation Engineers for Self-Evolving Recommender Systems](https://arxiv.org/abs/2610.37228) | 2026/arXiv | `mle-agent`, `automl-agent`, `hpo`, `trajectory` | [解析](parsed/2026-arxiv-autorse-mle-agent.md) | 保留 failed attempts；拆分 architecture/recipe actions，并匹配 GPU、token、wall-time 与多 seed |
 | codex_draft | [Tree-Structured Synergy of Large Language Models and Bayesian Optimization for Efficient CASH](https://arxiv.org/abs/2601.12355) | 2026/NeurIPS | `automl-agent`, `cash`, `mcts`, `memory`, `reflection` | [解析](parsed/2026-neurips-lb-mcts-cash.md) | 固定算法族后复核短期记忆与 proposer 切换；补 attempted/failed/tokens/wall-time 完整账本 |
