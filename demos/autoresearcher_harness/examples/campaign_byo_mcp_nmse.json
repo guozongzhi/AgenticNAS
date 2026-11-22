@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "execution_mode": "external_mcp",
+  "track": "architecture",
+  "model_family": "cnn_csi_feedback",
+  "kb_ref": "CNN-CSI-001",
+  "program_ref": "program.md",
+  "stages": ["training", "evaluation"],
+  "knowledge": {
+    "id": "CNN-CSI-001",
+    "revision": "v1",
+    "track": "architecture",
+    "status": "published",
+    "approved_uses": ["training", "evaluation"],
+    "text": "无线 CSI 反馈 CNN 编解码结构优化经验（minimize nmse_db，控制 macs_m 推理算量）。"
+  },
+  "base_hypothesis": "CSI-CNN 基线结构建立 NMSE(dB) 与 MACs(M) 参照基准。",
+  "baseline_model_ref": "uri://models/csi-cnn-base-v1",
+  "dataset_ref": "uri://datasets/csi-indoor-300m-v1",
+  "dev_evaluator_ref": "uri://evaluators/csi-dev-v1",
+  "holdout_evaluator_ref": "uri://evaluators/csi-holdout-v1",
+  "base_config": {
+    "encoder": {
+      "num_blocks": 4,
+      "channels": 64,
+      "kernel_size": 3,
+      "use_se": false
+    },
+    "decoder": {
+      "refine_blocks": 2,
+      "channels": 64
+    }
+  },
+  "base_architecture": {
+    "encoder": {
+      "num_blocks": 4,
+      "channels": 64,
+      "kernel_size": 3,
+      "use_se": false
+    },
+    "decoder": {
+      "refine_blocks": 2,
+      "channels": 64
+    }
+  },
+  "base_training_recipe": {
+    "epochs": 20,
+    "lr": 0.001,
+    "batch_size": 128,
+    "seed": 42
+  },
+  "mutable_fields": [
+    "encoder.num_blocks",
+    "encoder.channels",
+    "encoder.kernel_size",
+    "encoder.use_se",
+    "decoder.refine_blocks",
+    "decoder.channels"
+  ],
+  "budget": {
+    "max_trials": 8,
+    "per_trial_wall_seconds": 1800,
+    "total_wall_seconds": 28800,
+    "cost_metric": {
+      "name": "gpu_hours",
+      "unit": "h",
+      "max_total": 4.0
+    }
+  },
+  "acceptance": {
+    "primary_metric": {
+      "name": "nmse_db",
+      "unit": "dB",
+      "direction": "minimize",
+      "min_gain": 0.3,
+      "tie_tolerance": 0.05,
+      "holdout_target": -18.0
+    },
+    "compute_metric": {
+      "name": "macs_m",
+      "unit": "MMACs",
+      "direction": "minimize",
+      "max_value": 55.0,
+      "max_ratio": 1.10
+    },
+    "guardrails": {
+      "max_metrics": {"latency_ms": 2.5}
+    }
+  }
+}

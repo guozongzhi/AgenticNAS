@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "knowledge": {
+    "id": "KB-001",
+    "revision": "demo-v1",
+    "status": "published",
+    "approved_uses": ["training", "evaluation"],
+    "text": "演示经验。采样窗口一致时，结合资源占用、SINR、BLER 与重传判断吞吐下降原因。两类证据同时出现时保留混合退化判断。证据不足时请求补采信号。"
+  },
+  "hypothesis": "在固定样本预算中增加混合退化案例，可减少单一归因误判。",
+  "baseline_model_ref": "mock://models/baseline-v1",
+  "dataset_ref": "mock://datasets/throughput-source-v1",
+  "evaluator_ref": "mock://evaluators/throughput-holdout-v1",
+  "training_recipe": {"architecture": "fixed-small-model-v1", "epochs": 2, "seed": 42, "sample_budget": 240},
+  "budget": {"max_tasks": 3, "wall_seconds": 120},
+  "acceptance": {"total_cases": 24, "min_correct": 19},
+  "mock": {"duration_seconds": 1, "fail_stage": null, "lose_submit_reply_stage": null}
+}
