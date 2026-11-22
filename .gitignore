@@ -5,6 +5,15 @@ __pycache__/
 
 # Generated run artifacts stay beside their demo or experiment code.
 **/outputs/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.lock
+
+# Local editor and agent tool state (keep shared .claude/skills/ tracked).
+.obsidian/
+.claude/settings.local.json
+.firecrawl/
 
 *.egg-info/
 build/
