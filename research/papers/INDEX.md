@@ -70,6 +70,8 @@
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
 | codex_draft | [Hyperparameter and Neural Architecture Search via Evolutionary Optimization for Reinforcement Learning: HPNAS-RL](https://arxiv.org/abs/2610.36882) | 2026/arXiv | `mixed-search-space`, `nas`, `hpo`, `reinforcement-learning` | [解析](parsed/2026-arxiv-hpnas-rl-mixed.md) | 拆成 architecture-only 与 recipe-only 两轨，补 seeds、GPU-hours、失败/重复账本后再做 matched-budget joint 对照 |
+| codex_draft | [Self-EvolveRec: Self-Evolving Recommender Systems with LLM-based Directional Feedback](https://arxiv.org/abs/2602.12612) | 2026/NeurIPS | `mle-agent`, `mixed-search-space`, `recommender`, `directional-feedback`, `memory` | [解析](parsed/2026-neurips-self-evolverec-directional-feedback.md) | 冻结 typed architecture-only 动作和 evaluator；保留 critique+probe+archive，并补 failed/invalid/duplicate/GPU/token 完整账本 |
+| codex_draft | [BeFit: Shifting Complexity from Weights to Bernstein Activations for Resource-Constrained Sensing](https://arxiv.org/abs/2611.23520) | 2026/arXiv | `nas`, `mixed-search-space`, `hardware-aware`, `time-series`, `real-device` | [解析](parsed/2026-arxiv-befit-hardware-aware-nas.md) | 从结构搜索移除 learning-rate 字段；按同 attempted trials 重跑 random/evolution，并补 energy 与 pruning/failure ledger |
 | codex_draft | [Efficiently Estimating Optimal Hyperparameter Scaling Laws through Power-Law Entropy Search](https://arxiv.org/abs/2609.01431) | 2026/arXiv v3 | `mixed-search-space`, `bayesian-optimization`, `scaling-law`, `multi-fidelity` | [解析](parsed/2026-arxiv-ples-scaling-law-hpo.md) | 分离模型规模、数据 fidelity 与训练 HPO；把 ND proxy 换成 GPU-hours/墙钟实测复核 |
 | codex_draft | [Active-DiNTS: Active Differentiable Network Topology Search](https://arxiv.org/abs/2610.04787) | 2026/arXiv | `nas`, `active-learning`, `mixed-search-space`, `peak-memory` | [解析](parsed/2026-arxiv-active-dints.md) | 将 data acquisition 与 architecture search 拆轨；补实际源码、matched rerun、attempted/failed 与真实 endpoint 成本 |
 | codex_draft | [Evolutionary Architecture Search for Chlorophyll-a Prediction in Lakes using Sentinel-2](https://arxiv.org/abs/2610.10496) | 2026/AutoML4EO workshop | `nas`, `mixed-search-space`, `tiny-mlp`, `evolution` | [解析](parsed/2026-arxiv-chlorophyll-mlp-mixed-search.md) | 拆成 architecture-only/recipe-only matched-budget 两轨，并补真机 latency/memory/energy |
@@ -96,6 +98,7 @@
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
 | codex_draft | [Multi-objective Hyperparameter Optimization with Expert Priors (PriMO)](https://arxiv.org/abs/2511.08371) | 2025/arXiv v2 | `hpo`, `multi-objective`, `multi-fidelity`, `expert-prior`, `mixed-search-space` | [解析](parsed/2025-arxiv-primo-multi-objective-hpo.md) | 只取 PD1 fixed-architecture 子集；把 100k prior construction 和在线 trials 一并计费，OpenCLIP/LCBench 单列 mixed |
+| codex_draft | [ICICLE: In-Context Inference for Curve-Learning Extrapolation](https://arxiv.org/abs/2611.24469) | 2026/NeurIPS AXIOM Workshop | `hpo`, `multi-fidelity`, `freeze-thaw`, `surrogate`, `mixed-search-space` | [解析](parsed/2026-neuripsw-icicle-freeze-thaw-hpo.md) | 只取 PD1/TaskSet fixed-HPO 子集；分开计 surrogate pretraining 与在线 trials，并补 GPU-hours/failure ledger |
 
 ## 相邻方法：跨 NAS/HPO 任务的多保真 Agent
 
@@ -117,6 +120,8 @@
 | codex_draft | [Large Language Models Meet Bayesian Optimization: Towards Self-evolving Wireless Digital Twins](https://arxiv.org/abs/2610.31192) | 2026/arXiv | `agentic-bo`, `kernel-discovery`, `evolution`, `memory` | [解析](parsed/2026-arxiv-llm-bo-wireless-digital-twins.md) | 补 kernel attempted/valid、LLM calls/tokens、失败与墙钟账本；在固定 BO backbone 下做 matched-cost 对照 |
 | codex_draft | [A Closer Look at Agentic BBO: Benchmarking LLM Agents for Black-Box Optimization](https://arxiv.org/abs/2610.12183) | 2026/arXiv | `agentic-bo`, `benchmark`, `hpo`, `fixed-budget`, `failure-handling` | [解析](parsed/2026-arxiv-agenticbbo-bench.md) | 锁定 fixed architecture；匹配 attempted/evaluated/tokens/wall-time，并公开 invalid/retry/termination ledger |
 | codex_draft | [Agentic High-Dimensional Bayesian Optimization with Hypothesis- and Evidence-Guided Search](https://arxiv.org/abs/2609.34281) | 2026/arXiv | `agentic-bo`, `high-dimensional`, `hybrid`, `strategy-selection` | [解析](parsed/2026-arxiv-hera-agentic-hdbo.md) | 等待可运行代码；在 fixed-architecture HPO 上统一 100 attempted trials、tokens、墙钟和失败账本复核 |
+| codex_draft | [STaSBO: LLM-Guided Strategy Planning and Configuration Selection for Bayesian Optimization](https://arxiv.org/abs/2611.19214) | 2026/arXiv | `agentic-bo`, `strategy`, `memory`, `surrogate-selection`, `acquisition-selection` | [解析](parsed/2026-arxiv-stasbo-strategy-memory.md) | 将 history/strategy memory 映射到 typed Conv1d mutation policy；补 LLM calls/tokens/墙钟与失败账本 |
+| codex_draft | [HapBO: Harnessed alpha-pi Bayesian Optimization via Expert Natural Language Priors](https://arxiv.org/abs/2611.25100) | 2026/arXiv | `agentic-bo`, `hpo`, `llm-prior`, `cost-reporting`, `mixed-search-space` | [解析](parsed/2026-arxiv-hapbo-language-priors.md) | 作为 prior-only 对照；在 fixed-backbone recipe space 匹配 attempted trials、token、墙钟和 classical baselines |
 
 ## 相邻方法：参数与训练系统优化
 
