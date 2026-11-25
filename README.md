@@ -8,6 +8,7 @@
 
 - **Agentic NAS Demo**：以结构化 `ArchitectureSpec` 表示 4–10 层 Conv1d Transformer；Agent 只能提交经过校验的 `MutationAction`。
 - **多目标搜索基线**：保留随机/进化式 mutation、候选去重、Pareto 维护和可回放 observation/action/result trace。
+- **AutoResearch 自主优化技能**：在 `skills/autoresearch/` 提供零外部依赖、自带纯文件控制面与纯 Markdown 经验库的通用 BYO-MCP 模型结构优化与收尾 HPO 技能。
 - **本地论文证据工具**：从本地 PDF 抽取带页码的证据包，供 Codex 生成待人工核验的结构化论文笔记；不需要额外 LLM API。
 - **研究工作区**：维护论文索引、解析草稿、每日检索报告、技术点研究档案（`research/topics/`，当前包括边缘视觉小模型与 LLM 超参优化/训练自动化两条线），以及后续可复现实验的协议与结果。
 
@@ -31,10 +32,11 @@
 python3 -m pip install -e .
 ```
 
-从仓库根目录运行完整的 Demo 验证和一次小规模搜索：
+从仓库根目录运行完整的 Demo 验证、技能自检和一次小规模搜索：
 
 ```bash
 PYTHONPATH=demos python3 -m unittest discover -s demos/agentic_nas_demo/tests -v
+python3 -m unittest discover -s skills/autoresearch/tests -v
 PYTHONPATH=demos python3 -m agentic_nas_demo \
   --seed 7 \
   --initial-population 6 \
@@ -69,6 +71,9 @@ PYTHONPATH=demos/llm_paper_analysis python3 -m unittest discover \
 demos/
 ├── agentic_nas_demo/       # Conv1d Transformer、搜索空间、Agent 契约与 Pareto 搜索
 └── llm_paper_analysis/     # 本地 PDF 证据提取与测试
+
+skills/
+└── autoresearch/           # 自包含通用模型自主优化技能（BYO-MCP + 纯 Markdown 经验库）
 
 docs/
 ├── design/                 # 模型、层次搜索空间、Pareto 和 Agent 边界
@@ -110,6 +115,7 @@ Agent 提议必须是可序列化、可回放的声明式动作。validator 应�
 - [系统设计](docs/design/DESIGN.md)
 - [内部 Agent 接入](docs/guides/INTERNAL_AGENT_GUIDE.md)
 - [LLM 训练参数调优](docs/guides/LLM_TRAINING_TUNING.md)
+- [AutoResearch 技能说明](skills/autoresearch/SKILL.md)
 - [可运行 Demo](demos/README.md)
 - [研究资料入口](research/README.md)
 - [研究课题边界：LLM × NAS / LLM × HPO](research/topics/README.md)

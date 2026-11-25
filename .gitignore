@@ -3,8 +3,9 @@ __pycache__/
 .DS_Store
 .venv/
 
-# Generated run artifacts stay beside their demo or experiment code.
+# Generated run artifacts stay beside their demo, skill workspace, or experiment code.
 **/outputs/
+**/runs/
 *.sqlite3
 *.sqlite3-wal
 *.sqlite3-shm

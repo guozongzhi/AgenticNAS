@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`demos/agentic_nas_demo/` contains the runnable NAS reference package. `demos/llm_paper_analysis/` prepares page-labeled local PDF evidence for Codex; it must not require another LLM API. Keep each Demo's implementation, `examples/`, `tests/`, and ignored `outputs/` together.
+`demos/agentic_nas_demo/` contains the runnable NAS reference package. `demos/llm_paper_analysis/` prepares page-labeled local PDF evidence for Codex; it must not require another LLM API. `skills/autoresearch/` contains the self-contained, zero-dependency BYO-MCP autonomous optimization skill (`scripts/autoresearch.py`, `assets/`, `references/`, and `tests/`). Keep each Demo or Skill's implementation, `examples/`/`assets/`, `tests/`, and ignored `outputs/`/`runs/` together.
 
 Keep architecture material in `docs/design/`, integration guides in `docs/guides/`, and paper notes in `research/papers/`. New research runs belong in `experiments/YYYYMMDD-short-topic/`, with experiment-specific `src/`, `tests/`, and ignored `outputs/` directories.
 
@@ -36,10 +36,11 @@ Use search results only to discover papers. Support research claims with the off
 PYTHONPATH=demos python3 -m unittest discover -s demos/agentic_nas_demo/tests -v
 PYTHONPATH=demos python3 -m agentic_nas_demo --iterations 3
 PYTHONPATH=demos/llm_paper_analysis python3 -m unittest discover -s demos/llm_paper_analysis/tests -v
-python3 -m compileall -q demos/agentic_nas_demo demos/llm_paper_analysis
+python3 -m unittest discover -s skills/autoresearch/tests -v
+python3 -m compileall -q demos/agentic_nas_demo demos/llm_paper_analysis skills/autoresearch
 ```
 
-The first and third commands run each Demo's tests. The second runs the provider-free Pareto search. The last command catches import and syntax errors. Python 3.10+ and PyTorch 2.0+ are required; paper extraction additionally needs `pypdf`, PyMuPDF, or Poppler's `pdftotext`.
+The first, third, and fourth commands run each Demo's and Skill's tests. The second runs the provider-free Pareto search. The last command catches import and syntax errors. Python 3.10+ and PyTorch 2.0+ are required for `agentic_nas_demo`; `skills/autoresearch` uses the Python standard library only; paper extraction additionally needs `pypdf`, PyMuPDF, or Poppler's `pdftotext`.
 
 ## Coding Style & Naming Conventions
 

@@ -4,15 +4,15 @@
 
 ```text
 research/
+├── daily/           # 每日文献检索报告
 ├── topics/          # 独立技术点研究档案（长期维护）
-├── papers/
-│   ├── INDEX.md       # 阅读队列、状态和主题索引
-│   ├── TEMPLATE.md    # 单篇论文笔记模板
-│   ├── parsed/
-│   │   ├── README.md  # Codex 草稿的核验和保留规则
-│   │   └── TEMPLATE.md
-│   └── pdfs/
-│       └── README.md  # 本地 PDF 文件名、页数和校验值
+└── papers/
+    ├── INDEX.md       # 阅读队列、状态和主题索引
+    ├── parsed/
+    │   ├── README.md  # Codex 草稿的核验和保留规则
+    │   └── TEMPLATE.md
+    └── pdfs/
+        └── README.md  # 本地 PDF 文件名、页数和校验值
 ```
 
 ## 技术点档案
@@ -30,7 +30,7 @@ research/
 ## 使用流程
 
 1. 发现论文时先在 `papers/INDEX.md` 添加一行，状态为 `inbox`；
-2. 人工阅读时复制 `TEMPLATE.md`；由 Codex 解析时按 [`parsed/TEMPLATE.md`](papers/parsed/TEMPLATE.md) 生成 `codex_draft`；
+2. 撰写或由 Codex 生成结构化笔记时统一按 [`papers/parsed/TEMPLATE.md`](papers/parsed/TEMPLATE.md) 生成 `codex_draft`；
 3. 人工核对 Codex 草稿中的标题、数字、预算和证据位置，状态改为 `reading`；
 4. 完成实验协议、基线、公平性风险和可复现行动项后，状态改为 `retained`；
 5. 若已运行代码或重现关键结果，状态改为 `reproduced`，并链接到对应公开脚本、提交或实验 trace；

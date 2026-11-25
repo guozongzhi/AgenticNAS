@@ -6,8 +6,8 @@
 
 - `agentic_nas_demo/`：4–10 层 Conv1d Transformer、block/cell/op 搜索空间、LLM Agent 动作契约和 Pareto 搜索闭环。
 - `llm_paper_analysis/`：从本地 PDF 检索证据片段，供 Codex 直接生成结构化论文笔记。
-- [`autoresearcher_demo/`](autoresearcher_demo/README.md) 演示部门 Wiki 经验、仿真、训练和回归评测的工作台。
-- [`autoresearcher_harness/`](autoresearcher_harness/README.md) 基于本地模拟 MCP 工具的 Python Harness，支持任务持久化、停止、恢复和执行轨迹。
+
+> 面向已有 MCP 工具的通用模型自主优化流程已收敛为独立自包含技能，见 [`skills/autoresearch/`](../skills/autoresearch/SKILL.md)。
 
 从仓库根目录运行：
 

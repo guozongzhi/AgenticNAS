@@ -7,17 +7,22 @@ SKILL_SRC="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 MODE="global"
 TARGET_PROJECT=""
+ACTION="install"
+COPY_MODE=0
 DRY_RUN=0
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [--global | --project <dir>] [--dry-run]
+Usage: $(basename "$0") [--global | --project <dir>] [--copy] [--check | --uninstall] [--dry-run]
 
-Install the '${SKILL_NAME}' Agent Skill via symlinks for Claude Code, Codex, and OpenCode.
+Install, verify, or remove the self-contained '${SKILL_NAME}' Agent Skill.
 
 Options:
-  --global          Install into ~/.claude/skills and ~/.agents/skills (default)
-  --project <dir>   Install into <dir>/.claude/skills and <dir>/.agents/skills
+  --global          Target ~/.claude/skills and ~/.agents/skills (default)
+  --project <dir>   Target <dir>/.claude/skills and <dir>/.agents/skills
+  --copy            Copy standalone skill files instead of creating symlinks
+  --check           Verify installed skill files and run self-contained doctor check
+  --uninstall       Remove installed skill links/directories at target paths
   --dry-run         Print planned actions without modifying files
   -h, --help        Show this help message
 EOF
@@ -37,6 +42,18 @@ while [[ $# -gt 0 ]]; do
         exit 2
       fi
       shift 2
+      ;;
+    --copy)
+      COPY_MODE=1
+      shift
+      ;;
+    --check)
+      ACTION="check"
+      shift
+      ;;
+    --uninstall)
+      ACTION="uninstall"
+      shift
       ;;
     --dry-run)
       DRY_RUN=1
@@ -60,6 +77,7 @@ if [[ "${MODE}" == "global" ]]; then
     "${HOME}/.agents/skills/${SKILL_NAME}"
   )
 else
+  mkdir -p "${TARGET_PROJECT}"
   PROJECT_ABS="$(cd "${TARGET_PROJECT}" && pwd)"
   TARGETS=(
     "${PROJECT_ABS}/.claude/skills/${SKILL_NAME}"
@@ -67,17 +85,60 @@ else
   )
 fi
 
+if [[ "${ACTION}" == "check" ]]; then
+  status_code=0
+  for dest in "${TARGETS[@]}"; do
+    if [[ -f "${dest}/SKILL.md" && -f "${dest}/scripts/autoresearch.py" ]]; then
+      echo "OK: ${dest}/SKILL.md"
+    else
+      echo "MISSING: ${dest}/SKILL.md or scripts/autoresearch.py" >&2
+      status_code=1
+    fi
+  done
+  if [[ "${status_code}" -eq 0 ]]; then
+    python3 "${TARGETS[0]}/scripts/autoresearch.py" doctor >/dev/null && echo "OK: autoresearch.py doctor passed" || status_code=1
+  fi
+  exit "${status_code}"
+fi
+
+if [[ "${ACTION}" == "uninstall" ]]; then
+  for dest in "${TARGETS[@]}"; do
+    if [[ -L "${dest}" || -d "${dest}" ]]; then
+      if [[ "${DRY_RUN}" -eq 1 ]]; then
+        echo "[dry-run] rm -rf \"${dest}\""
+      else
+        rm -rf "${dest}"
+        echo "Removed: ${dest}"
+      fi
+    else
+      echo "Not installed: ${dest}"
+    fi
+  done
+  exit 0
+fi
+
 for dest in "${TARGETS[@]}"; do
   parent="$(dirname "${dest}")"
-  if [[ -e "${dest}" && ! -L "${dest}" ]]; then
-    echo "Skip (existing non-symlink path): ${dest}" >&2
+  if [[ -e "${dest}" && ! -L "${dest}" && "${COPY_MODE}" -eq 0 ]]; then
+    echo "Skip (existing non-symlink path; use --copy or --uninstall first): ${dest}" >&2
     continue
   fi
   if [[ "${DRY_RUN}" -eq 1 ]]; then
-    echo "[dry-run] ln -sfn \"${SKILL_SRC}\" \"${dest}\""
+    if [[ "${COPY_MODE}" -eq 1 ]]; then
+      echo "[dry-run] cp -R \"${SKILL_SRC}\" \"${dest}\""
+    else
+      echo "[dry-run] ln -sfn \"${SKILL_SRC}\" \"${dest}\""
+    fi
   else
     mkdir -p "${parent}"
-    ln -sfn "${SKILL_SRC}" "${dest}"
-    echo "Installed: ${dest} -> ${SKILL_SRC}"
+    if [[ "${COPY_MODE}" -eq 1 ]]; then
+      rm -rf "${dest}"
+      cp -R "${SKILL_SRC}" "${dest}"
+      rm -rf "${dest}/tests/__pycache__" "${dest}/scripts/__pycache__"
+      echo "Copied: ${SKILL_SRC} -> ${dest}"
+    else
+      ln -sfn "${SKILL_SRC}" "${dest}"
+      echo "Installed: ${dest} -> ${SKILL_SRC}"
+    fi
   fi
 done

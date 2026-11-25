@@ -1,0 +1,388 @@
+{
+  "generic_arch": {
+    "seed_entry_id": null,
+    "track": "architecture",
+    "title": "通用模型结构增益与算量优化经验库",
+    "summary": "面向通用骨干与任务头的结构搜索经验库，固定训练配方，在推理算量红线内优化验证集主指标。",
+    "base_config": {
+      "backbone": {
+        "depth": 6,
+        "width": 192,
+        "kernel_size": 5,
+        "block_type": "standard"
+      },
+      "head": {
+        "hidden_dim": 128
+      }
+    },
+    "base_training_recipe": {
+      "epochs": 20,
+      "lr": 0.001,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.05,
+      "seed": 42
+    },
+    "mutable_fields": [
+      "backbone.depth",
+      "backbone.width",
+      "backbone.kernel_size",
+      "backbone.block_type",
+      "head.hidden_dim"
+    ],
+    "param_bounds": {
+      "backbone.depth": {"type": "int", "min": 2, "max": 12},
+      "backbone.width": {"type": "int", "enum": [96, 128, 192, 256, 320]},
+      "backbone.kernel_size": {"type": "int", "enum": [3, 5, 7, 9]},
+      "backbone.block_type": {"type": "str", "enum": ["standard", "depthwise_separable", "inverted_bottleneck"]},
+      "head.hidden_dim": {"type": "int", "enum": [64, 128, 192, 256]}
+    },
+    "forbidden_ops": [],
+    "patterns": [],
+    "anti_patterns": []
+  },
+  "conv1d_transformer": {
+    "seed_entry_id": "CONV1D-ARCH-001",
+    "track": "architecture",
+    "model_family": "conv1d_transformer",
+    "title": "4–10 层因果 Conv1d Transformer 结构增益与算量优化经验",
+    "summary": "面向无 nn.Linear 的 4–10 层因果 Conv1d Transformer。固定训练配方，围绕深度、注意力头数、FFN 扩展比、因果卷积核尺寸与激活函数做增益-算量双目标寻优。",
+    "max_compute_ratio": 1.10,
+    "base_config": {
+      "embed_dim": 96,
+      "depth": 6,
+      "attention": {
+        "num_heads": 4
+      },
+      "ffn": {
+        "ratio": 3,
+        "kernel_size": 3,
+        "activation": "gelu"
+      }
+    },
+    "base_training_recipe": {
+      "epochs": 20,
+      "lr": 0.0005,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.05,
+      "seed": 42
+    },
+    "mutable_fields": [
+      "depth",
+      "attention.num_heads",
+      "ffn.ratio",
+      "ffn.kernel_size",
+      "ffn.activation"
+    ],
+    "param_bounds": {
+      "depth": {"type": "int", "min": 4, "max": 10},
+      "attention.num_heads": {"type": "int", "enum": [2, 4, 8]},
+      "ffn.ratio": {"type": "int", "enum": [2, 3, 4]},
+      "ffn.kernel_size": {"type": "int", "enum": [1, 3, 5]},
+      "ffn.activation": {"type": "str", "enum": ["gelu", "silu"]}
+    },
+    "forbidden_ops": ["nn.Linear"],
+    "patterns": [
+      {
+        "pattern_id": "P-CONV1D-K3-SILU",
+        "title": "FFN 采用局部因果卷积核 3 配合 SiLU 激活",
+        "suggested_changes": {"ffn.kernel_size": 3, "ffn.activation": "silu"},
+        "effect": {
+          "direction": "gain_up_compute_neutral",
+          "notes": "增强局部短程时序归纳偏置，参数量与 MACs 增幅约 1%"
+        },
+        "stats": {"observations": 2, "wins": 2, "mean_gain_pct": 2.4, "mean_compute_ratio": 1.012, "mean_cost": 120.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:conv1d-prior"]
+      },
+      {
+        "pattern_id": "P-CONV1D-SHALLOW6-R4",
+        "title": "在串行延迟受限时保持 6 层中等深度并将 FFN 扩展比提至 4",
+        "suggested_changes": {"depth": 6, "ffn.ratio": 4},
+        "effect": {
+          "direction": "gain_up_compute_down",
+          "notes": "相比盲目堆叠 9~10 层减少自回归串行步数，保持非线性通道容量"
+        },
+        "stats": {"observations": 1, "wins": 1, "mean_gain_pct": 1.8, "mean_compute_ratio": 0.94, "mean_cost": 110.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:conv1d-prior"]
+      }
+    ],
+    "anti_patterns": [
+      {
+        "pattern_id": "AP-CONV1D-D10-K5-R4",
+        "title": "同时推满 10 层深度、卷积核 5 与 FFN 扩展比 4",
+        "avoid_changes": {"depth": 10, "ffn.kernel_size": 5, "ffn.ratio": 4},
+        "failure_type": "compute_budget_exceeded",
+        "observed_compute_ratio": 1.68,
+        "observed_gain_pct": 3.1,
+        "observed_failure": "参数与因果卷积算量膨胀至 1.68x，远超 1.10x 预算红线",
+        "occurrences": 1,
+        "evidence_refs": ["seed:conv1d-prior"]
+      },
+      {
+        "pattern_id": "AP-CONV1D-D4-K1",
+        "title": "深度压至 4 层下界且退化为 kernel_size=1 纯逐点卷积",
+        "avoid_changes": {"depth": 4, "ffn.kernel_size": 1},
+        "failure_type": "accuracy_regression",
+        "observed_compute_ratio": 0.62,
+        "observed_gain_pct": -4.5,
+        "observed_failure": "丧失局部卷积感受野且层数过浅，序列建模质量明显退化",
+        "occurrences": 1,
+        "evidence_refs": ["seed:conv1d-prior"]
+      }
+    ]
+  },
+  "edge_vit": {
+    "seed_entry_id": "EDGE-VIT-ARCH-001",
+    "track": "architecture",
+    "model_family": "edge_vit",
+    "title": "边缘视觉轻量化混合 ViT/CNN 结构增益与延迟优化经验",
+    "summary": "面向工业检测与端侧分类的轻量化混合视觉骨干。固定训练配方，平衡窗口感受野、倒残差/深度可分离模块与分类/检测头宽度，严控端侧推理时延与峰值显存。",
+    "max_compute_ratio": 1.05,
+    "base_config": {
+      "backbone": {
+        "depth": 6,
+        "embed_dim": 192,
+        "mlp_ratio": 3.0,
+        "window_size": 7,
+        "block_type": "conv_attn_hybrid"
+      },
+      "head": {
+        "hidden_dim": 128
+      }
+    },
+    "base_training_recipe": {
+      "epochs": 50,
+      "lr": 0.0008,
+      "weight_decay": 0.05,
+      "warmup_ratio": 0.05,
+      "seed": 42
+    },
+    "mutable_fields": [
+      "backbone.depth",
+      "backbone.embed_dim",
+      "backbone.mlp_ratio",
+      "backbone.window_size",
+      "backbone.block_type",
+      "head.hidden_dim"
+    ],
+    "param_bounds": {
+      "backbone.depth": {"type": "int", "min": 4, "max": 10},
+      "backbone.embed_dim": {"type": "int", "enum": [128, 160, 192, 224, 256]},
+      "backbone.mlp_ratio": {"type": "float", "min": 1.5, "max": 4.0},
+      "backbone.window_size": {"type": "int", "enum": [7, 14]},
+      "backbone.block_type": {"type": "str", "enum": ["conv_attn_hybrid", "depthwise_separable", "inverted_bottleneck"]},
+      "head.hidden_dim": {"type": "int", "enum": [64, 128, 192]}
+    },
+    "forbidden_ops": [],
+    "patterns": [
+      {
+        "pattern_id": "P-VIT-IBN-MLP25",
+        "title": "采用倒残差块 inverted_bottleneck 并将 mlp_ratio 收敛至 2.5",
+        "suggested_changes": {"backbone.block_type": "inverted_bottleneck", "backbone.mlp_ratio": 2.5},
+        "effect": {
+          "direction": "gain_up_compute_down",
+          "notes": "对移动端/边缘 NPU 算子友好，推理延迟降低约 12% 且保持局部边缘特征"
+        },
+        "stats": {"observations": 2, "wins": 2, "mean_gain_pct": 1.9, "mean_compute_ratio": 0.88, "mean_cost": 240.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:edge-vision-prior"]
+      },
+      {
+        "pattern_id": "P-VIT-SLIM-HEAD64",
+        "title": "将任务头 hidden_dim 从 128 压缩至 64",
+        "suggested_changes": {"head.hidden_dim": 64},
+        "effect": {
+          "direction": "compute_down_tie",
+          "notes": "单任务工业场景类别数较少，收缩检测/分类头可在精度持平下削减尾部参数"
+        },
+        "stats": {"observations": 1, "wins": 1, "mean_gain_pct": 0.0, "mean_compute_ratio": 0.93, "mean_cost": 190.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:edge-vision-prior"]
+      }
+    ],
+    "anti_patterns": [
+      {
+        "pattern_id": "AP-VIT-W14-DIM256",
+        "title": "同时开启大窗口 window_size=14 与宽通道 embed_dim=256",
+        "avoid_changes": {"backbone.window_size": 14, "backbone.embed_dim": 256},
+        "failure_type": "compute_budget_exceeded",
+        "observed_compute_ratio": 1.92,
+        "observed_gain_pct": 2.3,
+        "observed_failure": "窗口注意力计算量与端侧峰值显存激增至 1.92x，超出实时部署上限",
+        "occurrences": 1,
+        "evidence_refs": ["seed:edge-vision-prior"]
+      }
+    ]
+  },
+  "cnn_csi": {
+    "seed_entry_id": "CNN-CSI-ARCH-001",
+    "track": "architecture",
+    "model_family": "cnn_csi_feedback",
+    "title": "无线信道 CSI 压缩反馈轻量化 CNN 编解码结构经验",
+    "summary": "面向终端侧无线 CSI 压缩与基站侧重构的非对称编解码结构优化。固定训练配方，在严格受限的上行编码 MACs 与时延护栏下最小化重构误差 NMSE(dB)。",
+    "max_compute_ratio": 1.10,
+    "base_config": {
+      "encoder": {
+        "num_blocks": 4,
+        "channels": 64,
+        "kernel_size": 3,
+        "use_se": false
+      },
+      "decoder": {
+        "refine_blocks": 2,
+        "channels": 64
+      }
+    },
+    "base_training_recipe": {
+      "epochs": 30,
+      "lr": 0.001,
+      "weight_decay": 0.01,
+      "seed": 42
+    },
+    "mutable_fields": [
+      "encoder.num_blocks",
+      "encoder.channels",
+      "encoder.kernel_size",
+      "encoder.use_se",
+      "decoder.refine_blocks",
+      "decoder.channels"
+    ],
+    "param_bounds": {
+      "encoder.num_blocks": {"type": "int", "min": 2, "max": 8},
+      "encoder.channels": {"type": "int", "enum": [32, 48, 64, 96, 128]},
+      "encoder.kernel_size": {"type": "int", "enum": [3, 5, 7]},
+      "encoder.use_se": {"type": "bool"},
+      "decoder.refine_blocks": {"type": "int", "min": 1, "max": 4},
+      "decoder.channels": {"type": "int", "enum": [32, 48, 64, 96]}
+    },
+    "forbidden_ops": [],
+    "patterns": [
+      {
+        "pattern_id": "P-CSI-SE-K5",
+        "title": "编码器开启轻量化 SE 通道注意力并将卷积核扩至 5",
+        "suggested_changes": {"encoder.use_se": true, "encoder.kernel_size": 5},
+        "effect": {
+          "direction": "gain_up_compute_neutral",
+          "notes": "增强多径空频相关性捕获，MACs 增幅约 2.4%"
+        },
+        "stats": {"observations": 1, "wins": 1, "mean_gain_pct": 5.2, "mean_compute_ratio": 1.024, "mean_cost": 0.45},
+        "confidence": "medium",
+        "evidence_refs": ["seed:csi-prior"]
+      },
+      {
+        "pattern_id": "P-CSI-DEC-REF3-CH48",
+        "title": "解码器精炼块增至 3 层并将解码通道收窄至 48",
+        "suggested_changes": {"decoder.refine_blocks": 3, "decoder.channels": 48},
+        "effect": {
+          "direction": "gain_up_compute_down",
+          "notes": "以更窄的多步残差细化替代宽通道卷积，降低总 MACs 约 7% 同时改善 NMSE"
+        },
+        "stats": {"observations": 1, "wins": 1, "mean_gain_pct": 3.1, "mean_compute_ratio": 0.93, "mean_cost": 0.41},
+        "confidence": "medium",
+        "evidence_refs": ["seed:csi-prior"]
+      }
+    ],
+    "anti_patterns": [
+      {
+        "pattern_id": "AP-CSI-WIDE-128",
+        "title": "编码器通道直接翻倍至 128",
+        "avoid_changes": {"encoder.channels": 128},
+        "failure_type": "compute_budget_exceeded",
+        "observed_compute_ratio": 1.84,
+        "observed_gain_pct": 8.0,
+        "observed_failure": "终端上行编码 MACs 激增至 1.84x，突破实时预算红线",
+        "occurrences": 1,
+        "evidence_refs": ["seed:csi-prior"]
+      }
+    ]
+  },
+  "hpo_recipe": {
+    "seed_entry_id": "FIXED-BACKBONE-HPO-001",
+    "track": "hpo",
+    "model_family": "fixed_backbone_hpo",
+    "title": "架构锁定后的固定骨干训练超参数调优经验",
+    "summary": "仅在模型架构完成独立留出集（Holdout）验收并冻结后启用。严格锁定模型深度、宽度、算子与连接方式，仅在等预算下优化学习率、预热比例、权重衰减与 Dropout。",
+    "max_compute_ratio": 1.01,
+    "base_config": {
+      "lr": 0.001,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.05,
+      "dropout": 0.0,
+      "epochs": 20
+    },
+    "base_architecture": {
+      "backbone": {
+        "depth": 6,
+        "width": 192,
+        "kernel_size": 5,
+        "block_type": "standard"
+      }
+    },
+    "mutable_fields": [
+      "lr",
+      "weight_decay",
+      "warmup_ratio",
+      "dropout",
+      "epochs"
+    ],
+    "param_bounds": {
+      "lr": {"type": "float", "min": 1e-5, "max": 1e-2},
+      "weight_decay": {"type": "float", "min": 0.0, "max": 0.2},
+      "warmup_ratio": {"type": "float", "min": 0.0, "max": 0.2},
+      "dropout": {"type": "float", "min": 0.0, "max": 0.3},
+      "epochs": {"type": "int", "min": 5, "max": 100}
+    },
+    "forbidden_ops": [],
+    "patterns": [
+      {
+        "pattern_id": "P-HPO-WARMUP01-LR5E4",
+        "title": "延长预热比例 warmup_ratio 至 0.10 并配合稳健学习率 5e-4",
+        "suggested_changes": {"lr": 0.0005, "warmup_ratio": 0.1},
+        "effect": {
+          "direction": "gain_up_compute_neutral",
+          "notes": "抑制深层注意力/卷积块早期梯度尖峰，推理算量完全不变（1.00x）"
+        },
+        "stats": {"observations": 2, "wins": 2, "mean_gain_pct": 1.6, "mean_compute_ratio": 1.0, "mean_cost": 150.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:hpo-prior"]
+      },
+      {
+        "pattern_id": "P-HPO-WD005-DROP01",
+        "title": "适度提高 weight_decay 至 0.05 并引入 dropout=0.1 缓解过拟合",
+        "suggested_changes": {"weight_decay": 0.05, "dropout": 0.1},
+        "effect": {
+          "direction": "gain_up_compute_neutral",
+          "notes": "缩小训练/验证集泛化间隙，零推理开销增量"
+        },
+        "stats": {"observations": 1, "wins": 1, "mean_gain_pct": 1.1, "mean_compute_ratio": 1.0, "mean_cost": 150.0},
+        "confidence": "medium",
+        "evidence_refs": ["seed:hpo-prior"]
+      }
+    ],
+    "anti_patterns": [
+      {
+        "pattern_id": "AP-HPO-LR1E2-NOWARMUP",
+        "title": "高学习率 lr=0.01 叠加零预热 warmup_ratio=0.0",
+        "avoid_changes": {"lr": 0.01, "warmup_ratio": 0.0},
+        "failure_type": "training_crash",
+        "observed_compute_ratio": 1.0,
+        "observed_gain_pct": null,
+        "observed_failure": "前 2 个 epoch 内触发梯度爆炸与 Loss NaN 发散崩溃",
+        "occurrences": 2,
+        "evidence_refs": ["seed:hpo-prior"]
+      },
+      {
+        "pattern_id": "AP-HPO-DROP03-SHORT",
+        "title": "短训预算下施加过高正则 dropout=0.3",
+        "avoid_changes": {"dropout": 0.3},
+        "failure_type": "accuracy_regression",
+        "observed_compute_ratio": 1.0,
+        "observed_gain_pct": -3.2,
+        "observed_failure": "小模型表征容量受限下强丢弃导致严重欠拟合",
+        "occurrences": 1,
+        "evidence_refs": ["seed:hpo-prior"]
+      }
+    ]
+  }
+}
