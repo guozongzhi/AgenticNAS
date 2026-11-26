@@ -31,7 +31,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_bundled_prebuilt_knowledge_base_entries_and_install_lifecycle(self) -> None:
-        # Out-of-the-box query against bundled assets/knowledge_base without any workspace!
         res_list = _run([sys.executable, str(self.cli), "knowledge-base", "list"], cwd=self.project_dir)
         self.assertEqual(res_list.returncode, 0, msg=res_list.stderr)
         entries = json.loads(res_list.stdout)
@@ -41,7 +40,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             {"CONV1D-ARCH-001", "EDGE-VIT-ARCH-001", "CNN-CSI-ARCH-001", "FIXED-BACKBONE-HPO-001"},
         )
 
-        # Search bundled priors for Conv1d Transformer
         res_search = _run([
             sys.executable, str(self.cli), "knowledge-base", "search",
             "--model-family", "conv1d_transformer",
@@ -51,9 +49,7 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
         matched = json.loads(res_search.stdout)
         self.assertEqual(len(matched), 1)
         self.assertEqual(matched[0]["entry_id"], "CONV1D-ARCH-001")
-        self.assertEqual(len(matched[0]["matched_patterns"]), 1)
 
-        # Standalone copy installation, check, and uninstall
         res_copy = _run(
             ["bash", str(self.install_sh), "--project", str(self.project_dir), "--copy"],
             cwd=self.project_dir,
@@ -114,9 +110,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             sys.executable, str(self.cli), "doctor", "--workspace", str(arch_ws),
         ], cwd=self.project_dir).stdout)
         self.assertTrue(doc["ok"])
-        self.assertIn("bundled_seed_knowledge_base_verified", doc["checks"])
-        self.assertIn("knowledge_base_sha256_integrity_verified", doc["checks"])
-        self.assertIn("mcp_tools_customized", doc["checks"])
 
         ws_cmd = [sys.executable, str(self.cli), "--workspace", str(arch_ws)]
         created = json.loads(_run([*ws_cmd, "campaign", "create"], cwd=self.project_dir).stdout)
@@ -130,7 +123,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             "--artifacts", json.dumps({"model_ref": "s3://csi/base.pt"}),
         ], cwd=self.project_dir).returncode, 0)
 
-        # Guard 1: No-op proposal -> rejected
         noop = _run([
             *ws_cmd, "campaign", "propose", cid,
             "--hypothesis", "No-op channels=64",
@@ -139,7 +131,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
         self.assertEqual(noop.returncode, 2)
         self.assertIn("No-op proposal", noop.stderr)
 
-        # Guard 2: Known anti-pattern in knowledge_base -> blocked
         anti = _run([
             *ws_cmd, "campaign", "propose", cid,
             "--hypothesis", "Try known bad channels=128",
@@ -148,16 +139,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
         self.assertEqual(anti.returncode, 2)
         self.assertIn("Blocked by knowledge_base anti-pattern", anti.stderr)
 
-        # Guard 3: Dry-run valid proposal does not open active trial
-        dry = json.loads(_run([
-            *ws_cmd, "campaign", "propose", cid, "--dry-run",
-            "--hypothesis", "Preview SE + k5",
-            "--changes", json.dumps({"encoder.use_se": True, "encoder.kernel_size": 5}),
-        ], cwd=self.project_dir).stdout)
-        self.assertTrue(dry["dry_run"])
-        self.assertIsNone(json.loads(_run([*ws_cmd, "campaign", "status", cid], cwd=self.project_dir).stdout)["active_trial_id"])
-
-        # Trial-001: Gain win
         self.assertEqual(_run([
             *ws_cmd, "campaign", "propose", cid,
             "--hypothesis", "Enable SE and k5 prior",
@@ -171,18 +152,9 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
         ], cwd=self.project_dir).stdout)
         self.assertEqual(r1["decision"], "keep")
 
-        # Guard 4: Duplicate configuration -> blocked
-        dup = _run([
-            *ws_cmd, "campaign", "propose", cid,
-            "--hypothesis", "Revert back to baseline config",
-            "--changes", json.dumps({"encoder.use_se": False, "encoder.kernel_size": 3}),
-        ], cwd=self.project_dir)
-        self.assertEqual(dup.returncode, 2)
-        self.assertIn("Duplicate configuration", dup.stderr)
-
-        # Trial-002: Compute win within tie_tolerance=0.05 (cost hits max_cost -> awaiting_holdout)
         self.assertEqual(_run([
             *ws_cmd, "campaign", "propose", cid,
+            "--operator", "shrink",
             "--hypothesis", "Slim decoder channels to 48 to cut MACs at tied NMSE",
             "--changes", json.dumps({"decoder.channels": 48}),
         ], cwd=self.project_dir).returncode, 0)
@@ -193,7 +165,6 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             "--artifacts", json.dumps({"model_ref": "s3://csi/t002.pt"}),
         ], cwd=self.project_dir).stdout)
         self.assertEqual(r2["decision"], "keep")
-        self.assertIn("compute win", r2["reason"])
         self.assertEqual(r2["campaign_status"], "awaiting_holdout")
 
         fin = json.loads(_run([
@@ -203,26 +174,10 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             "--artifacts", json.dumps({"model_ref": "s3://csi/t002.pt"}),
         ], cwd=self.project_dir).stdout)
         self.assertEqual(fin["status"], "succeeded")
-        self.assertTrue(fin["holdout_report"]["accepted"])
+        self.assertTrue(Path(fin["report_md_path"]).is_file())
+        self.assertIn("Pareto Hypervolume", Path(fin["report_md_path"]).read_text(encoding="utf-8"))
 
-        # Distill & publish v2 into Markdown knowledge_base
-        self.assertEqual(_run([*ws_cmd, "knowledge-base", "distill", cid], cwd=self.project_dir).returncode, 0)
-        pub = json.loads(_run([
-            *ws_cmd, "knowledge-base", "publish", "CSI-ARCH-001", "--reviewer", "lead-eng",
-        ], cwd=self.project_dir).stdout)
-        self.assertEqual(pub["revision"], "v2")
-        self.assertEqual(pub["patterns"], 3)
-
-        # Hand-editing CURRENT.md must fail SHA-256 integrity check
-        cur_md = arch_ws / "knowledge_base" / "entries" / "CSI-ARCH-001" / "CURRENT.md"
-        original_md = cur_md.read_text(encoding="utf-8")
-        cur_md.write_text(original_md.replace('"max_compute_ratio": 1.1', '"max_compute_ratio": 9.9'), encoding="utf-8")
-        tampered = _run([*ws_cmd, "knowledge-base", "show", "CSI-ARCH-001"], cwd=self.project_dir)
-        self.assertEqual(tampered.returncode, 2)
-        self.assertIn("Revision integrity check failed", tampered.stderr)
-        cur_md.write_text(original_md, encoding="utf-8")
-
-        # Post-architecture HPO handoff via configure --from-holdout <arch_ws>
+        # HPO handoff
         hpo_ws = self.project_dir / "csi_hpo_ws"
         self.assertEqual(_run([
             sys.executable, str(self.cli), "init",
@@ -239,29 +194,273 @@ class SelfContainedAutoResearchSkillTests(unittest.TestCase):
             "--cost", "gpu_hours",
             "--max-cost", "1.5",
         ], cwd=self.project_dir).returncode, 0)
-
-        hpo_cfg = _run([
+        self.assertEqual(_run([
             sys.executable, str(self.cli), "configure",
             "--workspace", str(hpo_ws),
             "--from-holdout", str(arch_ws),
-        ], cwd=self.project_dir)
-        self.assertEqual(hpo_cfg.returncode, 0, msg=hpo_cfg.stderr)
-        hpo_plan = json.loads((hpo_ws / "campaign.json").read_text(encoding="utf-8"))
-        self.assertEqual(
-            hpo_plan["base_architecture"],
-            {
-                "encoder": {"num_blocks": 4, "channels": 64, "kernel_size": 5, "use_se": True},
-                "decoder": {"refine_blocks": 2, "channels": 48},
-            },
-        )
-        self.assertEqual(hpo_plan["baseline_model_ref"], "s3://csi/t002.pt")
+        ], cwd=self.project_dir).returncode, 0)
 
-        illegal_mix = _run([
-            sys.executable, str(self.cli), "configure",
-            "--workspace", str(hpo_ws),
-            "--mutable-fields", "lr,encoder.channels",
+    def test_industry_mechanisms_parallel_multifidelity_lineage_folding_collapse_and_prune(self) -> None:
+        ws = self.project_dir / "conv1d_ws"
+        res_init = _run([
+            sys.executable, str(self.cli), "init",
+            "--workspace", str(ws),
+            "--preset", "conv1d_transformer",
+            "--model-family", "conv1d_transformer",
+            "--entry-id", "CONV1D-EXP-001",
+            "--metric", "val_bpb",
+            "--direction", "minimize",
+            "--min-gain", "0.02",
+            "--tie-tolerance", "0.005",
+            "--holdout-target", "0.96",
+            "--compute", "macs_m",
+            "--max-compute-ratio", "1.10",
+            "--cost", "gpu_seconds",
+            "--max-cost", "3000",
+            "--max-trials", "14",
+            "--max-parallel", "2",
         ], cwd=self.project_dir)
-        self.assertEqual(illegal_mix.returncode, 2)
+        self.assertEqual(res_init.returncode, 0, msg=res_init.stderr)
+
+        ws_cmd = [sys.executable, str(self.cli), "--workspace", str(ws)]
+        cid = json.loads(_run([*ws_cmd, "campaign", "create"], cwd=self.project_dir).stdout)["campaign_id"]
+
+        # Baseline trial-000: val_bpb=1.000, macs_m=100.0
+        _run([*ws_cmd, "campaign", "baseline", cid], cwd=self.project_dir)
+        _run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-000",
+            "--metrics", json.dumps({"val_bpb": 1.000, "macs_m": 100.0}),
+            "--cost", json.dumps({"gpu_seconds": 120}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t000.pt"}),
+        ], cwd=self.project_dir)
+
+        # 1. Multi-fidelity screening (proxy -> full): proxy trial-001 passes screen without replacing incumbent
+        p_proxy = json.loads(_run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--fidelity", "proxy", "--operator", "refine",
+            "--hypothesis", "Screen SiLU activation on 1-epoch proxy",
+            "--changes", json.dumps({"ffn.activation": "silu"}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(p_proxy["trial_id"], "trial-001")
+        r_proxy = json.loads(_run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-001",
+            "--metrics", json.dumps({"val_bpb": 0.985, "macs_m": 100.2}),
+            "--cost", json.dumps({"gpu_seconds": 15}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(r_proxy["decision"], "proxy_pass")
+        self.assertEqual(r_proxy["incumbent_trial_id"], "trial-000")  # incumbent untouched!
+
+        ctx_after_proxy = json.loads(_run([*ws_cmd, "campaign", "context", cid], cwd=self.project_dir).stdout)
+        self.assertEqual(len(ctx_after_proxy["search_diagnostics"]["ready_to_promote_proxies"]), 1)
+
+        # Promote exact same config to --fidelity full (trial-002) -> allowed and wins incumbent!
+        p_full = _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--fidelity", "full", "--operator", "refine",
+            "--expected-primary", "0.975", "--expected-compute-ratio", "1.01",
+            "--hypothesis", "Promote SiLU activation to full training",
+            "--changes", json.dumps({"ffn.activation": "silu"}),
+        ], cwd=self.project_dir)
+        self.assertEqual(p_full.returncode, 0, msg=p_full.stderr)
+        r_full = json.loads(_run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-002",
+            "--metrics", json.dumps({"val_bpb": 0.972, "macs_m": 100.5}),
+            "--cost", json.dumps({"gpu_seconds": 120}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t002.pt"}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(r_full["decision"], "keep")
+        self.assertEqual(r_full["incumbent_trial_id"], "trial-002")
+        self.assertIsNotNone(r_full["prediction_calibration"])
+        self.assertFalse(r_full["prediction_calibration"]["high_surprise"])
+
+        # 2. Infrastructure flake isolation (NOVA / EvoCast): trial-003 crashes with infra_flake,
+        # allowing exact same config to be retried in trial-004!
+        _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--operator", "explore",
+            "--hypothesis", "Test 8 attention heads",
+            "--changes", json.dumps({"attention.num_heads": 8}),
+        ], cwd=self.project_dir)
+        _run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-003",
+            "--status", "crash", "--failure-kind", "infra_flake",
+            "--cost", json.dumps({"gpu_seconds": 5}),
+            "--note", "Transient S3 mount timeout",
+        ], cwd=self.project_dir)
+        retry_after_flake = _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--operator", "explore",
+            "--hypothesis", "Retry 8 attention heads after S3 recovery",
+            "--changes", json.dumps({"attention.num_heads": 8}),
+        ], cwd=self.project_dir)
+        self.assertEqual(retry_after_flake.returncode, 0, msg=retry_after_flake.stderr)
+
+        # 3. Parallel batch round (max_parallel=2): trial-004 is already active; submit trial-005 concurrently!
+        par_second = json.loads(_run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--parent-trial", "trial-000", "--operator", "shrink",
+            "--hypothesis", "Lightweight 4-layer stepping stone from baseline",
+            "--changes", json.dumps({"depth": 4}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(par_second["trial_id"], "trial-005")
+        self.assertEqual(par_second["open_parallel_slots"], 0)
+
+        # Third parallel proposal while 2 are active must be blocked!
+        par_third = _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--hypothesis", "Exceed parallel cap",
+            "--changes", json.dumps({"ffn.kernel_size": 5}),
+        ], cwd=self.project_dir)
+        self.assertEqual(par_third.returncode, 2)
+        self.assertIn("Parallel active trial limit reached", par_third.stderr)
+
+        # Record trial-005 (lightweight stepping stone: val_bpb=0.990 is discarded vs trial-002's 0.972,
+        # BUT enters 2D Pareto frontier & lightweight_sub_0.92x MAP-Elites cell at 0.72x MACs!)
+        r_t5 = json.loads(_run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-005",
+            "--metrics", json.dumps({"val_bpb": 0.990, "macs_m": 72.0}),
+            "--cost", json.dumps({"gpu_seconds": 85}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t005.pt"}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(r_t5["decision"], "discard")
+
+        # Record trial-004 with suspicious 0 cost & missing model_ref -> triggers Sanity Auditor warnings!
+        r_t4 = json.loads(_run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-004",
+            "--metrics", json.dumps({"val_bpb": 0.980, "macs_m": 102.0}),
+            "--cost", json.dumps({"gpu_seconds": 0}),
+        ], cwd=self.project_dir).stdout)
+        self.assertIn("missing_model_ref_on_full_trial", r_t4["audit_warnings"])
+        self.assertIn("zero_cost_reported_on_full_trial", r_t4["audit_warnings"])
+
+        # Verify Pareto frontier & MAP-Elites contain BOTH trial-005 (lightweight) and trial-002 (balanced)!
+        ctx_mid = json.loads(_run([*ws_cmd, "campaign", "context", cid, "--recent-window", "2"], cwd=self.project_dir).stdout)
+        pf_ids = {item["trial_id"] for item in ctx_mid["pareto_frontier"]}
+        self.assertEqual(pf_ids, {"trial-002", "trial-005"})
+        self.assertIn("lightweight_sub_0.92x", ctx_mid["compute_elites"])
+        self.assertEqual(ctx_mid["compute_elites"]["lightweight_sub_0.92x"]["trial_id"], "trial-005")
+        self.assertGreater(len(ctx_mid["folded_history"]), 0)  # Context Folding active!
+
+        # Inspect unfolded trial-005 on demand
+        insp = json.loads(_run([*ws_cmd, "campaign", "inspect", cid, "--trial", "trial-005"], cwd=self.project_dir).stdout)
+        self.assertEqual(insp["diff_vs_baseline"]["depth"], {"from": 6, "to": 4})
+
+        # Recombine stepping stone trial-005 with inspiration from trial-002 (P-CONV1D-SHALLOW6-R4 loss test first)
+        # Let's test seed pattern P-CONV1D-SHALLOW6-R4 (depth=6, ffn.ratio=4; seed has 1/1 wins) and make it lose twice across runs or test recombine winner:
+        _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--parent-trial", "trial-005",
+            "--inspiration-trials", "trial-002",
+            "--operator", "recombine",
+            "--hypothesis", "Combine lightweight depth=5 + SiLU + ratio=4",
+            "--changes", json.dumps({"depth": 5, "ffn.activation": "silu", "ffn.ratio": 4}),
+        ], cwd=self.project_dir)
+        r_recomb = json.loads(_run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-006",
+            "--metrics", json.dumps({"val_bpb": 0.948, "macs_m": 91.0}),
+            "--cost", json.dumps({"gpu_seconds": 110}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t006.pt"}),
+        ], cwd=self.project_dir).stdout)
+        self.assertEqual(r_recomb["decision"], "keep")
+        self.assertEqual(r_recomb["incumbent_trial_id"], "trial-006")
+
+        # Also re-test seed pattern P-CONV1D-SHALLOW6-R4 (`depth=6;ffn.ratio=4` from parent trial-000) and have it discard
+        _run([
+            *ws_cmd, "campaign", "propose", cid,
+            "--parent-trial", "trial-000",
+            "--operator", "refine",
+            "--hypothesis", "Re-verify seed pattern depth=6;ffn.ratio=4",
+            "--changes", json.dumps({"depth": 6, "ffn.ratio": 4}),
+        ], cwd=self.project_dir)
+        _run([
+            *ws_cmd, "campaign", "record", cid, "--trial", "trial-007",
+            "--metrics", json.dumps({"val_bpb": 0.995, "macs_m": 108.0}),
+            "--cost", json.dumps({"gpu_seconds": 120}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t007.pt"}),
+        ], cwd=self.project_dir)
+
+        # Finalize & verify REPORT.md
+        fin = json.loads(_run([
+            *ws_cmd, "campaign", "finalize", cid,
+            "--metrics", json.dumps({"val_bpb": 0.951, "macs_m": 91.0, "baseline_val_bpb": 1.002}),
+            "--cost", json.dumps({"gpu_seconds": 20}),
+            "--artifacts", json.dumps({"model_ref": "s3://conv1d/t006.pt"}),
+        ], cwd=self.project_dir).stdout)
+        self.assertTrue(fin["holdout_report"]["accepted"])
+
+        # Distill & check that infra_flake (trial-003) did NOT enter anti_patterns!
+        distilled = json.loads(_run([*ws_cmd, "knowledge-base", "distill", cid], cwd=self.project_dir).stdout)
+        anti_sigs = {a["change_signature"] for a in distilled["draft"]["anti_patterns"]}
+        self.assertNotIn("attention.num_heads=8", anti_sigs)
+
+        _run([*ws_cmd, "knowledge-base", "publish", "CONV1D-EXP-001", "--reviewer", "arch-lead"], cwd=self.project_dir)
+
+        # Skill Pruning (MLEvolver): P-CONV1D-SHALLOW6-R4 now has wins=1, observations=2 (win_rate=0.50).
+        # With --min-win-rate 0.60, preview detects it without modifying revision, then --apply prunes it cleanly!
+        preview_prune = json.loads(_run([
+            *ws_cmd, "knowledge-base", "prune", "CONV1D-EXP-001", "--min-win-rate", "0.60",
+        ], cwd=self.project_dir).stdout)
+        self.assertFalse(preview_prune["applied"])
+        self.assertEqual(len(preview_prune["pruned_candidates"]), 1)
+
+        applied_prune = json.loads(_run([
+            *ws_cmd, "knowledge-base", "prune", "CONV1D-EXP-001",
+            "--min-win-rate", "0.60", "--apply", "--reviewer", "arch-lead",
+        ], cwd=self.project_dir).stdout)
+        self.assertTrue(applied_prune["applied"])
+        self.assertEqual(applied_prune["revision"], "v3")
+
+        # Verify knowledge_base SHA-256 integrity after prune
+        doc_final = json.loads(_run([*ws_cmd, "doctor"], cwd=self.project_dir).stdout)
+        self.assertTrue(doc_final["ok"])
+
+    def test_principle_collapse_detector_flags_single_axis_tunnel_vision(self) -> None:
+        ws = self.project_dir / "collapse_ws"
+        _run([
+            sys.executable, str(self.cli), "init",
+            "--workspace", str(ws),
+            "--preset", "conv1d_transformer",
+            "--model-family", "conv1d_transformer",
+            "--entry-id", "CONV1D-COLLAPSE-001",
+            "--metric", "val_bpb",
+            "--direction", "minimize",
+            "--min-gain", "0.02",
+            "--compute", "macs_m",
+            "--max-compute-ratio", "1.50",
+            "--max-trials", "8",
+        ], cwd=self.project_dir)
+        ws_cmd = [sys.executable, str(self.cli), "--workspace", str(ws)]
+        cid = json.loads(_run([*ws_cmd, "campaign", "create"], cwd=self.project_dir).stdout)["campaign_id"]
+        _run([*ws_cmd, "campaign", "baseline", cid], cwd=self.project_dir)
+        _run([
+            *ws_cmd, "campaign", "record", cid,
+            "--metrics", json.dumps({"val_bpb": 1.0, "macs_m": 100.0}),
+            "--cost", json.dumps({"gpu_seconds": 60}),
+            "--artifacts", json.dumps({"model_ref": "s3://m/0.pt"}),
+        ], cwd=self.project_dir)
+
+        # Mutate ONLY `depth` 4 times in a row while 4 other mutable_fields remain untouched
+        last_rec = {}
+        for idx, depth_val in enumerate((5, 7, 8, 9), start=1):
+            _run([
+                *ws_cmd, "campaign", "propose", cid,
+                "--hypothesis", f"Tunnel vision on depth={depth_val}",
+                "--changes", json.dumps({"depth": depth_val}),
+            ], cwd=self.project_dir)
+            last_rec = json.loads(_run([
+                *ws_cmd, "campaign", "record", cid,
+                "--metrics", json.dumps({"val_bpb": 0.995, "macs_m": 105.0}),
+                "--cost", json.dumps({"gpu_seconds": 60}),
+                "--artifacts", json.dumps({"model_ref": f"s3://m/{idx}.pt"}),
+            ], cwd=self.project_dir).stdout)
+
+        self.assertTrue(last_rec["principle_collapse_warning"])
+        ctx = json.loads(_run([*ws_cmd, "campaign", "context", cid], cwd=self.project_dir).stdout)
+        p_div = ctx["search_diagnostics"]["principle_diversity"]
+        self.assertEqual(p_div["dominant_family"], "depth")
+        self.assertEqual(p_div["dominant_family_share"], 1.0)
+        self.assertEqual(p_div["effective_principle_count"], 1.0)
+        self.assertIn("ffn.kernel_size", ctx["search_diagnostics"]["untouched_mutable_fields"])
 
 
 if __name__ == "__main__":

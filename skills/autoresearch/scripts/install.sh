@@ -134,7 +134,7 @@ for dest in "${TARGETS[@]}"; do
     if [[ "${COPY_MODE}" -eq 1 ]]; then
       rm -rf "${dest}"
       cp -R "${SKILL_SRC}" "${dest}"
-      rm -rf "${dest}/tests/__pycache__" "${dest}/scripts/__pycache__"
+      find "${dest}" -name "__pycache__" -type d -prune -exec rm -rf {} +
       echo "Copied: ${SKILL_SRC} -> ${dest}"
     else
       ln -sfn "${SKILL_SRC}" "${dest}"

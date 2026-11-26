@@ -1,8 +1,8 @@
-# 纯 Markdown 经验知识库（Knowledge Base）格式与完整性规范
+# 纯 Markdown 经验知识库（Knowledge Base）格式、完整性与修剪规范
 
 经验知识库（`knowledge_base/`）完全采用纯 Markdown 文件存储（零数据库依赖），兼顾人工 / Obsidian 阅读、Git Diff 审查与 `autoresearch.py` 强类型解析。
 
-- 技能内置开箱即用的预置知识库目录：[`assets/knowledge_base/INDEX.md`](../assets/knowledge_base/INDEX.md)（含 `CONV1D-ARCH-001`、`EDGE-VIT-ARCH-001`、`CNN-CSI-ARCH-001`、`FIXED-BACKBONE-HPO-001` 四条完整 Markdown 条目）。
+- 内置预置知识库目录：[`assets/knowledge_base/INDEX.md`](../assets/knowledge_base/INDEX.md)（含 `CONV1D-ARCH-001`、`EDGE-VIT-ARCH-001`、`CNN-CSI-ARCH-001`、`FIXED-BACKBONE-HPO-001`）。
 
 ---
 
@@ -23,9 +23,9 @@ knowledge_base/
 ```
 
 > **切勿手工直接编辑 `CURRENT.md`**：
-> 文档底部 `<!-- knowledge_base:record:start -->` JSON 块包含 `content_sha256` 签名；手改文本会导致 `Revision integrity check failed` 报错并使 `revisions/v1.md` 与 `campaign.json` 冻结快照失步。
+> 底部 `<!-- knowledge_base:record:start -->` JSON 块包含 `content_sha256` 签名；手改文本会触发 `Revision integrity check failed`。
 > - **初始化阶段修改 `v1` 种子配置**：统一使用 `autoresearch.py configure --workspace <ws> ...`。
-> - **实验结束后沉淀新修订 `v2+`**：统一执行 `knowledge-base distill` → 用户审核 → `knowledge-base publish`。
+> - **实验沉淀与规则淘汰**：统一使用 `knowledge-base distill` / `knowledge-base publish` / `knowledge-base prune`。
 
 ---
 
@@ -49,20 +49,15 @@ knowledge_base/
 }
 ```
 
-支持的 `type`：`int`（严格整数，拒绝 `bool`）、`float`（有限数值）、`str`（非空字符串）、`bool`（布尔值）。
-
 ---
 
-## 3. 模式（`patterns`）与反例（`anti_patterns`）去重聚合
+## 3. 模式加权聚合、自然衰减与陈旧经验修剪（Skill Pruning）
 
-- 主键为规范化变更签名 `change_signature`（按键名排序的 `field=json_val` 分号拼接串，如 `encoder.kernel_size=5;encoder.use_se=true`）。
-- **有效模式方向枚举（`effect.direction`）**：
-  - `gain_up_compute_down`（增益提升且算量下降 <0.99x，最高优先级）
-  - `gain_up_compute_neutral`（增益提升且算量基本持平 <=1.02x）
-  - `gain_up_compute_up`（增益提升且算量在红线内温和上升）
-  - `compute_down_tie`（主指标持平且算量显著下降）
-  - `other`
-- **失效反例类型枚举（`failure_type`）**：
-  - `compute_budget_exceeded` | `guardrail_violated` | `accuracy_regression` | `training_crash` | `other`
-  - 当提案命中已发布 `anti_patterns` 的 `change_signature` 时，`campaign propose` 默认直接拦截并返回历史失效原因（除非显式传入 `--force-anti-pattern`）。
-- **跨 Campaign 发布聚合**：`knowledge-base publish` 合并草案时，相同 `change_signature` 的模式自动按观测次数加权更新 `observations / wins / mean_gain_pct / mean_compute_ratio / mean_cost` 并提升 `confidence`（`low` < `medium`/`dev_only` < `verified_holdout`）；相同签名的反例累加 `occurrences`。
+1. **加权聚合与负向衰减**：
+   - `patterns` 与 `anti_patterns` 以规范化 `change_signature` 作为唯一去重主键；
+   - `distill` 仅采集 `fidelity == "full"` 且非 `infra_flake` 的可靠试验结果；
+   - 当某条历史已知 `pattern` 在新 Campaign 中被复测却遭遇 `discard / crash` 时，`distill` 会自动生成一条 `wins=0, observations=1` 的衰减记录——`publish` 合并后该模式的胜率（`wins / observations`）随之自然下降。
+2. **主动淘汰陈旧失效经验（`knowledge-base prune`，参考 `MLEvolver` Skill Deletion）**：
+   - 长期堆积未验证或低胜率规则会稀释检索信噪比；
+   - 运行 `knowledge-base prune <entry_id> [--min-win-rate 0.34] [--min-observations 2]` 可预览待清理的低胜率非 Holdout 模式（默认保护 `verified_holdout` 模式与所有 `anti_patterns` 安全护栏）；
+   - 经用户确认后加 `--apply --reviewer <name>` 生成精简后的新不可变修订 `revisions/vN.md`。

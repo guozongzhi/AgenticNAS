@@ -45,7 +45,7 @@
 
 ---
 
-<!-- 机器精确解析块：请通过 autoresearch.py configure / knowledge-base distill / knowledge-base publish 维护，勿手改导致 SHA-256 校验失败 -->
+<!-- 机器精确解析块：请通过 autoresearch.py configure / knowledge-base distill / knowledge-base publish / knowledge-base prune 维护，勿手改导致 SHA-256 校验失败 -->
 <!-- knowledge_base:record:start -->
 ```json
 {

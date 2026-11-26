@@ -7,7 +7,7 @@ AR="python3 <skill_dir>/scripts/autoresearch.py"
 ```
 
 - 传入 `--workspace <ws>` 后，引擎自动定位 `<ws>/campaign.json`、`<ws>/knowledge_base/` 与 `<ws>/runs/`；
-- 若未传 `--workspace`，运行 `$AR knowledge-base list` 或 `$AR knowledge-base search` 将直接检索技能内置的预置经验知识库（`assets/knowledge_base/`）。
+- 未传 `--workspace` 时，运行 `$AR knowledge-base list / search` 直接检索技能内置预置知识库（`assets/knowledge_base/`）。
 
 ---
 
@@ -21,20 +21,13 @@ $AR init --workspace ./csi_autoresearch --preset cnn_csi \
   --metric nmse_db --direction minimize --min-gain 0.3 \
   --tie-tolerance 0.05 --holdout-target -18.0 \
   --compute macs_m --compute-unit MMACs --max-compute-ratio 1.10 \
-  --cost gpu_hours --cost-unit h --max-cost 4.0 --max-trials 6
+  --cost gpu_hours --cost-unit h --max-cost 4.0 \
+  --max-trials 8 --max-parallel 2
 ```
 
-- **内置 `--preset`**：`generic_arch`（默认架构轨道）、`conv1d_transformer`、`edge_vit`、`cnn_csi`、`hpo_recipe`（默认 HPO 轨道）。
-- **`--max-trials` 口径**：包含 `trial-000` 基线！`--max-trials 6` = `1 次基线 + 5 次候选提案`。
-- **生成目录结构**（纯文本 / JSON / TSV / Markdown，零二进制数据库）：
-  ```text
-  <workspace>/
-    campaign.json          # 实验计划契约与冻结经验知识库快照
-    program.md             # 定制化 Agent 执行指令书
-    mcp_tools.md           # 环境 MCP 工具名与输入/输出字段映射表
-    knowledge_base/        # 纯 Markdown 分层不可变经验知识库
-    runs/                  # 各 Campaign 纯文件状态目录（state.json / results.tsv / trace.jsonl / holdout_report.json）
-  ```
+- **内置 `--preset`**：`generic_arch`、`conv1d_transformer`、`edge_vit`、`cnn_csi`、`hpo_recipe`。
+- **`--max-trials` 口径**：包含 `trial-000` 基线（`8` = `1 次基线 + 7 次候选`）。
+- **`--max-parallel`**：单轮允许同时处于 `awaiting_result` 的并发试验数（默认 `1`；多 GPU MCP 集群可设 `2~8`）。
 
 ### 1.2 安全定制 `v1` 种子与 NAS→HPO 交接（`configure`）
 
@@ -50,12 +43,10 @@ $AR configure --workspace ./csi_autoresearch \
   }' \
   --forbidden-ops 'nn.Linear' \
   --guardrails '{"max_metrics": {"latency_ms": 2.5}}' \
-  --tie-tolerance 0.05
+  --tie-tolerance 0.05 --max-parallel 2
 ```
 
-- 支持 `--spec <json_or_file>` 一次性传入复合覆盖配置。
-- **结构验收后交接收尾 HPO**：在 `--track hpo` 工作区执行 `$AR configure --workspace <hpo_ws> --from-holdout <arch_ws> ...`，自动提取胜出 `incumbent_config` 写入不可变 `base_architecture` 并继承 `baseline_model_ref`。
-- **历史保护**：一旦目标 `entry_id` 已发布 `v2+` 或已有实证记录，`configure` 拒绝覆盖 `v1`，强制走 `knowledge-base distill` + `knowledge-base publish`。
+- **结构验收后交接收尾 HPO**：`$AR configure --workspace <hpo_ws> --from-holdout <arch_ws> ...`，自动把胜出 `incumbent_config` 冻结为 `base_architecture` 并继承 `baseline_model_ref`。
 
 ### 1.3 环境与工作区体检（`doctor`）
 
@@ -63,45 +54,51 @@ $AR configure --workspace ./csi_autoresearch \
 $AR doctor --workspace ./csi_autoresearch
 ```
 
-检查项：Python 版本、技能内置预置知识库完整性、`<ws>/knowledge_base/` 所有条目的 `content_sha256` 完整性、`campaign.json` 字段与分轨隔离、`mutable_fields` 是否均已定义 `param_bounds`、`mcp_tools.md` 是否残留 `<your_*_mcp_tool>` 占位符，以及 `runs/latest.txt` 指向的当前活跃状态。
-
 ---
 
 ## 2. 纯 Markdown 经验知识库命令（`knowledge-base`）
 
 | 子命令 | 说明 |
 | --- | --- |
-| `knowledge-base list [--track architecture\|hpo] [--status published\|draft]` | 列出经验条目与模式/反例/实证/草案统计 |
+| `knowledge-base list [--track architecture\|hpo] [--status published\|draft]` | 列出条目及模式/反例/实证/草案计数 |
 | `knowledge-base search [--query ...] [--model-family ...] [--track ...] [--field ...] [--direction gain_up_compute_down] [--max-compute-ratio 1.02] [--min-gain-pct 2.0] [--failure-type compute_budget_exceeded]` | 多维检索经验模式与反例 |
 | `knowledge-base show <entry_id> [--revision v1]` | 查看当前生效条目或指定历史不可变修订 |
 | `knowledge-base drafts [entry_id]` | 查看 `drafts/*.md` 中隔离的待审草案 |
-| `knowledge-base distill [campaign_id\|latest] [--entry-id ...]` | 从 Campaign 轨迹自动提炼 `keep` 模式与失败反例生成待审草案 |
-| `knowledge-base publish <entry_id> [--revision ...] [--reviewer <name>]` | 人工审批后按 `change_signature` 加权去重合并，生成新修订 `vN.md` 并追加 `EVIDENCE.md` |
-| `knowledge-base import-presets [--preset ...] [--overwrite]` | 将技能内置预置经验条目导入目标 `knowledge_base/` 目录 |
-| `knowledge-base reindex` | 从 `entries/` 源文件全量重建 `INDEX.md` |
+| `knowledge-base distill [campaign_id\|latest] [--entry-id ...]` | 从全保真试验轨迹提炼有效模式、失效反例及旧模式衰减观测，生成待审草案（自动剔除 `infra_flake` 与低保真试验） |
+| `knowledge-base publish <entry_id> [--revision ...] [--reviewer <name>]` | 人工审批后按 `change_signature` 加权合并，生成不可变修订 `vN.md` 并追加 `EVIDENCE.md` |
+| `knowledge-base prune <entry_id> [--min-win-rate 0.34] [--min-observations 2] [--apply] [--reviewer <name>]` | 预览或淘汰低胜率失效模式（MLEvolver Skill Deletion），默认保留 `verified_holdout` 与全部 `anti_patterns` |
+| `knowledge-base import-presets [--preset ...] [--overwrite]` | 将内置预置条目导入目标 `knowledge_base/` |
+| `knowledge-base reindex` | 从 `entries/` 全量重建 `INDEX.md` |
 
 ---
 
-## 3. 棘轮研究循环命令（`campaign`）
+## 3. 多维演化棘轮命令（`campaign`）
 
 | 子命令 | 说明 |
 | --- | --- |
-| `campaign create [--plan <json>] [--knowledge-entry <entry_id>] [--knowledge-revision v1]` | 冻结经验知识库快照创建新 Campaign 并更新 `runs/latest.txt` |
-| `campaign baseline [id\|latest]` | 开启 `trial-000` 基线工单（返回 `candidate_config` 与冻结项） |
-| `campaign context [id\|latest]` | 输出 `incumbent`、`param_bounds`、`remaining_budget`、`search_diagnostics`（含 `untried_knowledge_priors`、已测签名、`plateau_warning`）与 `results_tsv` |
-| `campaign propose [id\|latest] --hypothesis "..." --changes '{...}' [--reuse-simulation] [--dry-run] [--allow-repeat] [--force-anti-pattern]` | 硬校验白名单、`param_bounds`、`forbidden_ops`、无变化拦截、全局 `config_id` 去重与反例拦截；`--dry-run` 仅预检不落盘 |
-| `campaign record [id\|latest] [--trial ...] --status succeeded\|crash\|failed\|timeout\|cancelled --metrics '{...}' --cost '{...}' --artifacts '{...}' [--external-jobs '[...]'] [--note "..."]` | 回填 MCP 实测指标与成本，执行棘轮裁决并实时刷新 `results.tsv` |
-| `campaign finalize [id\|latest] --metrics '{...}' --cost '{...}' --artifacts '{"model_ref":"..."}'` | 对 `incumbent.model_ref` 记录唯一一次 Holdout 盲评并生成 `holdout_report.json` |
-| `campaign status / events / stop [id\|latest]` | 查看完整状态 JSON、审计事件流 `trace.jsonl`，或提前结束探索进入 `awaiting_holdout` |
+| `campaign create [--plan <json>] [--knowledge-entry <entry_id>] [--knowledge-revision v1]` | 冻结经验知识库快照创建 Campaign |
+| `campaign baseline [id\|latest]` | 开启 `trial-000` 基线工单 |
+| `campaign context [id\|latest] [--recent-window 6]` | 输出 Context Folding 上下文（`folded_history` + `recent_trials`）、`incumbent`、`pareto_frontier`、`compute_elites`、`pareto_hypervolume` 与 `search_diagnostics` |
+| `campaign inspect [id\|latest] --trial <trial-XXX>` | 按需无损展开任意历史试验的完整记录、`diff_vs_baseline` 与 `diff_vs_parent` |
+| `campaign propose [id\|latest] --hypothesis "..." --changes '{...}' [--parent-trial <id>] [--inspiration-trials <t1,t2>] [--operator refine\|explore\|recombine\|ablate\|shrink] [--fidelity smoke\|proxy\|full] [--expected-primary <val>] [--expected-compute-ratio <val>] [--reuse-simulation] [--dry-run]` | 校验白名单、`param_bounds`、`forbidden_ops`、同保真去重与反例拦截；支持跳板父节点、多保真筛查、并发批次与预测登记 |
+| `campaign record [id\|latest] [--trial <id>] --status succeeded\|crash\|failed\|timeout\|cancelled [--failure-kind oom\|nan_divergence\|timeout\|metric_invalid\|infra_flake] --metrics '{...}' --cost '{...}' --artifacts '{...}' [--external-jobs '[...]'] [--note "..."]` | 回填 MCP 结果，执行保真分层裁决、预测误差校准与反作弊审计，实时刷新 `results.tsv` |
+| `campaign finalize [id\|latest] --metrics '{...}' --cost '{...}' --artifacts '{"model_ref":"..."}'` | 对 `incumbent.model_ref` 记录唯一一次 Holdout 盲评，自动产出 `holdout_report.json` 与 `REPORT.md` |
+| `campaign report [id\|latest]` | 生成/刷新结构化实验总结报告 `REPORT.md` |
+| `campaign status / events / stop [id\|latest]` | 查看完整状态 JSON、事件流 `trace.jsonl`，或提前收束进入 `awaiting_holdout` |
 
 ---
 
-## 4. 棘轮裁决与状态流转规则
+## 4. 保真分层与棘轮裁决规则
 
-1. **护栏校验**：违反 `acceptance.guardrails`（`max_metrics / min_metrics`）→ `discard`。
-2. **算量红线**：超出 `compute_metric.max_value` 或 `max_ratio` → `discard`。
-3. **增益胜出（`gain win`）**：相对当前 `incumbent` 的方向归一化改进 `delta >= min_gain`（当 `min_gain == 0` 时要求 `delta > tie_tolerance`）→ `keep` 并晋升 `incumbent`。
-4. **同增益算量胜出（`compute win`）**：`abs(delta) <= tie_tolerance` 且算量更优 → `keep`。
-5. **同算量简洁胜出（`simplicity win`）**：`abs(delta) <= tie_tolerance` 且 `complexity_score`（相对 `base_config` 修改字段数）更小 → `keep`。
-6. **其余** → `discard`；`crash / failed / timeout` → `crash`（成本照计，非基线轮次不中断后续探索）。
-7. **自动收束保护（`awaiting_holdout`）**：当累计成本达到 `max_total` 或试验数达到 `max_trials` 时，状态自动转为 `awaiting_holdout`——此时拦截任何新训练提案，但**始终允许执行唯一一次 `campaign finalize`**，彻底避免预算耗尽锁死最终盲评。
+- **低保真筛查（`fidelity = smoke | proxy`）**：
+  - 绝不改写全保真 `incumbent`；护栏与算量合规且相对 `incumbent` 不差于 `-tie_tolerance` 判 `proxy_pass`（列入 `ready_to_promote_proxies`），否则判 `proxy_discard`；
+  - 允许对 `proxy_pass` 的相同配置再次提交 `--fidelity full` 完成正式晋升验证。
+- **全保真棘轮（`fidelity = full`）**：
+  1. 护栏违规 → `discard`；
+  2. 算量超 `max_value` 或 `max_ratio` → `discard`；
+  3. 方向归一化改进 `delta >= min_gain`（`min_gain==0` 时须 `delta > tie_tolerance`）→ `keep`（`gain win`）；
+  4. `abs(delta) <= tie_tolerance` 且算量更优 → `keep`（`compute win`）；
+  5. `abs(delta) <= tie_tolerance` 且 `complexity_score` 更低 → `keep`（`simplicity win`）；
+  6. 其余 → `discard`。
+- **异常与基础设施隔离**：
+  - `--failure-kind infra_flake` 计入成本账本，但允许重提相同配置，不计入 `consecutive_non_keep` 停滞，也不进入 `anti_patterns`。

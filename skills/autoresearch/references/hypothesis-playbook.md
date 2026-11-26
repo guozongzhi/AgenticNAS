@@ -1,53 +1,43 @@
-# 假设生成与防坍缩实战手册（Hypothesis Playbook）
+# 五算子假设生成与防坍缩实战手册（Hypothesis Playbook）
 
-本手册指导 Agent 在多轮棘轮循环中高效利用每次训练预算，避免无归因乱改、重复探索、算量爆表或局部坍缩。
-
----
-
-## 1. 通用实验纪律（NAS 与 HPO 共用）
-
-1. **单轴可归因原则（One-Axis Attribution）**
-   - 除直接验证经验知识库（`knowledge_base`）中已登记的组合模式（`untried_knowledge_priors`）外，每轮提案相对当前 `incumbent` **只修改 1 个字段**。
-   - 同时修改 3 个以上不相关字段既无法判断收益与副作用来源，也会推高 `complexity_score`（相对 `base_config` 的变更字段数），导致平局时丧失 `simplicity win` 优势。
-2. **先预检再立项（`--dry-run`）**
-   - 不确定嵌套路径、边界或是否与历史配置同构时，先运行 `campaign propose latest --dry-run ...`，确认 `valid: true` 且 `config_id` 唯一后再正式开单。
-3. **读取 `search_diagnostics` 主动早停**
-   - 当 `context.search_diagnostics.plateau_warning == true`（连续 ≥3 轮 `discard/crash`），必须切换搜索维度（例如从“扩深度”切到“改局部卷积核/算子类型”或“压算量换 `compute win`”）；若所有正交维度均已尝试且无增益，立即执行 `campaign stop latest` 进入 `awaiting_holdout`，不空耗剩余预算。
+本手册吸收 `MLEvolver`、`AlphaEvolve`、`Heuresis` 与《Principle-Level Local Optima》的实证规律，指导 Agent 用**五类显式演化算子**高效分配预算。
 
 ---
 
-## 2. 结构优化主线策略（`track=architecture`）
+## 1. 五大显式提案算子（`--operator`）
 
-固定 `base_training_recipe` 不变，围绕**主指标增益**与**推理算量（FLOPs / MACs / Latency / Params）**做三阶段推进：
+每次调用 `campaign propose` 时，必须根据 `context.search_diagnostics` 明确声明本轮使用的算子：
 
-### 阶段一：高性价比先验与低开销感受野探索（前 30% 预算）
-- 优先消费 `context.search_diagnostics.untried_knowledge_priors` 中方向为 `gain_up_compute_down` 或 `gain_up_compute_neutral` 的模式。
-- 若无现成先验，优先测试**算量增幅小但表征变化明显**的算子级/局部结构变更：
-  - 卷积核尺寸 / 窗口大小（如 `ffn.kernel_size: 1 -> 3`、`window_size`）；
-  - 轻量化通道/门控注意力（如开启 `use_se`、激活函数 `gelu <-> silu`）；
-  - 注意力头数或分组配置（保持总通道不变，调整 `num_heads`）。
-
-### 阶段二：容量分配与算量红线博弈（中段 50% 预算）
-- **若主指标仍低于目标且算量余量充足（`compute_ratio < 0.9 * max_ratio`）**：
-  - 尝试适度加深 `depth`（每次 `+1` 或 `+2`）或提高瓶颈扩展比 `ffn_ratio / mlp_ratio`。
-  - 谨慎倍增全局宽度 `channels / embed_dim`（宽度翻倍通常令算量呈平方级 $\approx 4\times$ 增长，极易触发 `compute_budget_exceeded`）。
-- **若候选增益达标但因 `compute budget exceeded` 被 `discard`**：
-  - 下一轮将重算子替换为轻量化算子（如 `block_type: standard -> depthwise_separable / inverted_bottleneck`），或裁剪次要模块通道（如 `decoder.channels`、`head.hidden_dim`），把算量拉回红线内。
-
-### 阶段三：同精度减算量收官（末段 20% 预算）
-- 当主指标已达预期、且 `tie_tolerance > 0` 时，针对当前 `incumbent` 尝试**减法提案**（如砍掉 1 层冗余深度、收缩头部维度）：只要主指标退化不超过 `tie_tolerance` 且算量下降，棘轮即会判定 `compute win` 并晋升更轻量的 `incumbent`。
+| 算子 | 适用时机 | 标准用法 |
+| --- | --- | --- |
+| `refine` | 默认局部精调：沿已知有效方向微调单个参数，或消费 `untried_knowledge_priors` | 基于当前 `incumbent` 修改 1 个字段 |
+| `explore` | 当 `principle_collapse_warning == true`、`plateau_warning == true` 或存在 `untouched_mutable_fields` 时强制切换原理轴 | 挑选 `untouched_mutable_fields` 中的正交维度，或指定 `--parent-trial` 从 `compute_elites` 跳板重新出发 |
+| `recombine` | 当 `pareto_frontier` 或并行批次中出现两条互补有效分支（例如 `trial-001` 提精度、`trial-002` 降算量） | `--parent-trial trial-001 --inspiration-trials trial-002 --operator recombine` 合成优势特征 |
+| `ablate` | 当某个胜出 `incumbent` 同时改了 $\ge 2$ 个字段（`complexity_score` 较高）时验证最小充分性 | 逐个还原次要字段回基线值，若精度在 `tie_tolerance` 内持平即可赢得 `simplicity win` |
+| `shrink` | 主指标已达预期、冲刺更低推理 FLOPs / MACs / 时延时 | 在 `tie_tolerance` 容差内缩窄次要通道、减少层数或切换轻量算子争取 `compute win` |
 
 ---
 
-## 3. 独立收尾 HPO 策略（`track=hpo`）
+## 2. 防止“原理级局部坍缩”与自校准纪律
 
-仅在结构已完成 Holdout 验收并用 `configure --from-holdout` 锁定 `base_architecture` 后执行：
+1. **盯紧有效原理数 $N_{\text{eff}}$ 与未探索轴**：
+   - 切勿连续 4 轮只改同一个字段（如反复试 `depth=5,6,7,8`）。一旦 `principle_diversity.principle_collapse_warning == true`，下一轮**必须**切换至 `untouched_mutable_fields` 中的未测维度。
+2. **先预测再验证（Predict-Then-Verify）**：
+   - 提交提案时传入 `--expected-primary <val> --expected-compute-ratio <val>`。
+   - 回填后检查 `prediction_calibration`：若出现 `high_surprise == true`（例如本以为算量不变，实测算量暴涨 1.4x），在下一轮假设中显式修正对该模块算量耦合关系的认知。
+3. **昂贵训练优先走两级多保真漏斗（`proxy -> full`）**：
+   - 当全量训练单次耗时较长时，先用 `--fidelity proxy`（如短周期/子集训练 MCP）低成本验证候选是否 OOM、算量是否超标及早期趋势是否正向；
+   - 从 `search_diagnostics.ready_to_promote_proxies` 中挑出最优候选，用相同修改提交 `--fidelity full` 正式冲击 `incumbent`。
 
-1. **按敏感度分层单步调节**：
-   - **第一优先级（学习率与预热）**：在当前 `lr` 附近按对数步长（如 `0.5x`、`1.5x`、`2.0x`）探索，必要时联动 `warmup_ratio`（大 `lr` 配稍长 warmup 防早期发散）。
-   - **第二优先级（正则化）**：观察开发集过拟合/欠拟合趋势，单向微调 `weight_decay` 或 `dropout`（欠拟合降正则，过拟合升正则）。
-   - **第三优先级（训练轮数 `epochs`）**：仅当验证集预算契约允许可变 `epochs` 且单轮成本仍在 `max_cost` 范围内时微调；若对比协议要求固定训练 token/sample 预算，切勿把 `epochs` 放入 `mutable_fields`。
-2. **OOM / NaN 发散快速止损**：
-   - 若某轮因 `lr` 过高触发 NaN `crash`，记入 `--status crash` 后立即回到 `incumbent` 向更小 `lr` 或更高 `warmup_ratio` 探索，绝不在崩溃点同方向继续试探。
-3. **结论隔离**：
-   - 收尾 HPO 带来的增益必须单独归因于 `track=hpo` 经验知识库条目，不得回写进 `track=architecture` 条目冒充结构收益。
+---
+
+## 3. 分轨专项策略
+
+### 3.1 结构优化主线（`track=architecture`）
+- **前期（低开销表征改善）**：优先验证 `gain_up_compute_down / neutral` 先验，测试局部感受野（卷积核/窗口尺寸）、轻量化门控注意力（SE / 激活函数）与注意力头配置。
+- **中期（容量与算量红线博弈）**：结合 `compute_elites` 中的 `lightweight_sub_0.92x` 跳板，用 `recombine` 将轻量化骨干与高表征模块组合，突破算量上限瓶颈。
+- **收官（消融减重）**：对胜出模型执行 `ablate` 与 `shrink`，剥离无实质贡献的冗余结构改动。
+
+### 3.2 独立收尾 HPO（`track=hpo`）
+- 仅在 `configure --from-holdout <arch_ws>` 冻结胜出结构后启动。
+- 按“学习率与预热联动（`lr + warmup_ratio`）→ 正则化（`weight_decay / dropout`）→ 调度周期”分层探索；遇到梯度爆炸立即标 `--failure-kind nan_divergence` 并向低学习率/长预热侧回撤。
