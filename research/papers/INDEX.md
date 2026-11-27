@@ -8,6 +8,7 @@
 
 | Status | Paper | Year/Venue | Tags | Note | Next action |
 |---|---|---|---|---|---|
+| codex_draft | [Can AI Design a Better nnU-Net? A Hypothesis-Driven Architecture Discovery Loop from Failures to Design Rules](https://arxiv.org/abs/2611.32384) | 2026/arXiv | `llm-nas`, `hypothesis-driven`, `memory`, `failure-analysis`, `pareto` | [解析](parsed/2026-arxiv-hypothesis-driven-nnunet-nas.md) | 在 typed Conv1d 固定配方空间复现 principle-memory；匹配 attempted/valid/trained/GPU/LLM/墙钟预算并补代码、重复与运行失败账本 |
 | codex_draft | [From Human Intent to In-Orbit Action: A Self-Learning Large Language Model Agent for 6G Satellite Networks](https://arxiv.org/abs/2610.34387) | 2026/arXiv | `llm-nas`, `graph-neuroevolution`, `memory`, `pareto` | [解析](parsed/2026-arxiv-almond-llm-nas.md) | 冻结 reward/recipe，只复现 structure-only proposals；补 candidate、LLM、GPU、真实 latency/memory/energy 完整账本 |
 | codex_draft | [Neural Architecture Discovery via Autonomous Evolution](https://arxiv.org/abs/2507.18074) | 2026/COLM | `llm-nas`, `autonomous-research`, `memory`, `code-generation` | [解析](parsed/2026-colm-asi-arch.md) | 固化 typed architecture-only 子空间；补完整 reject/retry/trained ledger、LLM 成本、多 search seeds 与真实设备 Pareto |
 | codex_draft | [EvoCast: Reliable Autonomous Research Agents for Iterative Forecasting Architecture Evolution](https://arxiv.org/abs/2610.04517) | 2026/arXiv | `llm-nas`, `time-series`, `memory`, `failure-ledger` | [解析](parsed/2026-arxiv-evocast.md) | 将开放代码编辑收敛为 typed Conv1d 动作；按 attempted/valid/trained/GPU/token/墙钟预算复核 stateless/memory-aware 对照 |
